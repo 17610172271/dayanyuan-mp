@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/filmDetail/main",
     "pages/index/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
@@ -12,7 +11,7 @@
     "pages/search/main",
     "pages/bacode/main",
     "pages/cinemaSelect/main",
-
+    "pages/filmDetail/main",
     "pages/mineComments/main",
     "pages/orderConfirm/main",
     "pages/orderDetail/main",
