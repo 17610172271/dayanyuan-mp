@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "我的评价",
+  "component": true,
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index",
+    "i-input": "../../../static/iView/input/index",
+    "i-rate": "../../../static/iView/rate/index"
+  }
+}

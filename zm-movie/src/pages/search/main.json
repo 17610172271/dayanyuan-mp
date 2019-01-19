@@ -1,0 +1,12 @@
+{
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "热映",
+    "navigationBarTextStyle": "black"
+  },
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index",
+    "i-input": "../../../static/iView/input/index"
+  }
+}

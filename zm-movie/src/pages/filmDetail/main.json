@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "选择影片",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

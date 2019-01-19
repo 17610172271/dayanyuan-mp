@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "i-row": "../../../static/iView/row/index",
+    "i-col": "../../../static/iView/col/index",
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

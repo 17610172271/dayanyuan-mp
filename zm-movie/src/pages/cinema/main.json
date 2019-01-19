@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "影院列表",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}
