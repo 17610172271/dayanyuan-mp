@@ -25,7 +25,7 @@
                 <div class="text-sm text-gray text-line-20">时长: 148分钟 <span class="pull-right text-xs text-orange">32543次观看</span></div>
             </div>
             <ul class="cinema-list-container bg-white">
-                <li v-for="(item, index) in 10" :key="index" class="cinema-list-item border-bottom relative">
+                <li v-for="(item, index) in 10" :key="index" @click="nextPage" class="cinema-list-item border-bottom relative">
                     <h5 class="text-bold">卢米埃影城(芳草地店)</h5>
                     <div class="text-sm m-t-sm text-line-20">朝阳区东大桥路9号芳草地大厦LG-26</div>
                     <div class="text-gray text-sm m-t-xs">近期可观看场次：15:45 | 23:00</div>
@@ -54,6 +54,11 @@
                 wx.setStorage({
                     key: 'history',
                     data: this.history
+                })
+            },
+            nextPage () {
+                wx.navigateTo({
+                    url: '../timeSelect/main'
                 })
             }
         },

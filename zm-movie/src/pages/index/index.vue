@@ -68,7 +68,31 @@
                 </i-row>
             </div>
         </div>
-
+        <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="知道了" cancel-text="去导航" @ok="doOk1" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">不是该影仓观影券 <br> 请您到2号影仓</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="知道了" cancel-text="再来一单" @ok="doOk2" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg">30分钟</span> <br> <span class="text-orange">(请在观影前10分钟内打开舱门)</span></div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal3" ok-text="知道了" cancel-text="去登陆" @ok="doOk3" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">您还没有登录 <br> 请先登录</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal4" ok-text="再看看" cancel-text="去预定" @ok="doOk4" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg p-v-sm">您没有该影院的订单</div>
+            </div>
+        </i-modal>
     </div>
 </template>
 
@@ -87,7 +111,12 @@ export default {
             indicatorDots: true,
             autoplay: false,
             interval: 5000,
-            duration: 1000
+            duration: 1000,
+            modal: false,
+            modal1: false,
+            modal2: true,
+            modal3: false,
+            modal4: false,
         }
     },
     methods: {
@@ -95,7 +124,29 @@ export default {
             wx.navigateTo({
                 url: '../search/main'
             })
-        }
+        },
+        doOk () {
+            this.modal = false
+        },
+        doCancel () {
+            this.modal = false
+            this.modal1 = false
+            this.modal2 = false
+            this.modal3 = false
+            this.modal4 = false
+        },
+        doOk1 () {
+            this.modal1 = false
+        },
+        doOk2 () {
+            this.modal2 = false
+        },
+        doOk3 () {
+            this.modal3 = false
+        },
+        doOk4 () {
+            this.modal4 = false
+        },
     },
     created () {
     }

@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/main",
+    "pages/bacode/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
     "pages/mineCollect/main",
@@ -9,18 +10,17 @@
     "pages/counter/main",
     "pages/city/main",
     "pages/search/main",
-    "pages/bacode/main",
     "pages/cinemaSelect/main",
     "pages/filmDetail/main",
-    "pages/mineComments/main",
-    "pages/orderConfirm/main",
     "pages/orderDetail/main",
-    "pages/timeSelect/main"
+    "pages/orderConfirm/main",
+    "pages/timeSelect/main",
+    "pages/mineComments/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "影仓",
+    "navigationBarTitleText": "热映",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -31,7 +31,7 @@
       {
         "pagePath": "pages/index/main",
         "text": "热映",
-        "iconPath": "/static/img/ic-hot-cat@3x.png",
+        "iconPath": "/static/img/ic-hot-nor@3x.png",
         "selectedIconPath": "/static/img/ic-hot-cat@3x.png"
       },
       {
@@ -43,8 +43,8 @@
       {
         "pagePath": "pages/mineHome/main",
         "text": "我的",
-        "iconPath": "/static/img/ic-hot-cat@3x.png",
-        "selectedIconPath": "/static/img/ic-hot-cat@3x.png"
+        "iconPath": "/static/img/ic-me-nor@3x.png",
+        "selectedIconPath": "/static/img/ic-me@3x.png"
       }
     ]
   }

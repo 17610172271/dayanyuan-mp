@@ -9,7 +9,7 @@
                 <div class="order-item-top relative">
                     <div>2号影仓</div>
                     <div class="text-gray m-t-sm">北京市东城区崇文门外大街40号</div>
-                    <div class="location-icon"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
+                    <div class="location-icon icon-item"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
                 </div>
                 <div class="order-item-bottom">
                     <div class="text-lg">后来的我们 <span class="pull-right text-sm text-line-normal">支付剩余 <span class="text-orange">12分46秒</span></span></div>
@@ -74,15 +74,19 @@
         top: 52rpx;
         right: 40rpx;
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        box-shadow: 0 4px 4px 0 rgba(255, 161, 80, 0.24), 0 0 20px 0 rgba(255, 143, 0, 0.37);
+        width: 64rpx;
+        height: 64rpx;
+        box-shadow: 0 8rpx 8rpx 0 rgba(255, 161, 80, 0.24), 0 0 40rpx 0 rgba(255, 143, 0, 0.37);
         background-image: linear-gradient(302deg, #f57c00, #ffa726);
     }
     .location-icon .icon-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
-        top: 16rpx;
-        left: 16rpx;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
     }
 
 </style>

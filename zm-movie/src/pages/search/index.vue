@@ -17,7 +17,7 @@
         </div>
         <div class="search-result-container" v-else>
             <ul>
-                <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in 5" :key="index">
+                <li class="m-b-sm bg-white search-result-item relative" @click="nextPage" v-for="(item,index) in 5" :key="index">
                     <div class="poster-container"></div>
                     <h5 class="text-lg text-line-normal">后来的外卖</h5>
                     <div class="text-sm text-gray text-line-20 m-t-sm">导演: 刘若英</div>
@@ -44,6 +44,11 @@
                 wx.setStorage({
                     key: 'history',
                     data: this.history
+                })
+            },
+            nextPage () {
+                wx.navigateTo({
+                    url: '../filmDetail/main'
                 })
             }
         },

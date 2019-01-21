@@ -72,12 +72,6 @@
         height: 100%;
         vertical-align: middle;
     }
-    .modal-padding {
-        padding-left: 48rpx;
-    }
-    .tel-ipt {
-        color: rgba(42, 42, 42, 0.87);
-        border: 2rpx solid #bcbcbc;
-        border-radius: 12rpx;
-    }
+
+
 </style>

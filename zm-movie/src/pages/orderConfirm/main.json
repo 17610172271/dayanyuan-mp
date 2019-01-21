@@ -1,6 +1,7 @@
 {
-  "navigationBarTitleText": "影院列表",
+  "navigationBarTitleText": "确认订单",
   "usingComponents": {
-    "i-icon": "../../../static/iView/icon/index"
+    "i-icon": "../../../static/iView/icon/index",
+    "i-modal": "../../../static/iView/modal/index"
   }
 }

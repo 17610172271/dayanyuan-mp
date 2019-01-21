@@ -426,6 +426,9 @@ textarea {
 .border-bottom {
     border-bottom: 1px solid #f5f6f6;
 }
+.border-top-dashed {
+    border-top: 1px dashed #d5d5d5;
+}
 .border-top {
     border-top: 1px solid #f5f6f6;
 }
@@ -535,6 +538,14 @@ textarea {
     line-height: 60rpx !important;
     font-size: 24rpx !important;
     border-radius: 4rpx !important;
+}
+.modal-padding {
+    padding-left: 48rpx;
+}
+.tel-ipt {
+    color: rgba(42, 42, 42, 0.87);
+    border: 2rpx solid #bcbcbc;
+    border-radius: 12rpx;
 }
 
 

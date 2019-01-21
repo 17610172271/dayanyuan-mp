@@ -20,7 +20,7 @@
             </view>
             <view class="i-modal-actions" wx:else>
                 <i-grid i-class="i-modal-grid" wx:if="{{ showOk || showCancel }}">
-                    <i-grid-item i-class="i-modal-grid-item" wx:if="{{ showCancel }}">
+                    <i-grid-item i-class="i-modal-grid-item i-modal-grid-item-first" wx:if="{{ showCancel }}">
                         <i-button i-class="i-modal-btn-cancel" long type="ghost" bind:click="handleClickCancel">{{ cancelText }}</i-button>
                     </i-grid-item>
                     <i-grid-item i-class="i-modal-grid-item-last" wx:if="{{ showOk }}">
