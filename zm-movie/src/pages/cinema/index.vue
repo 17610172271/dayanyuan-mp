@@ -5,30 +5,76 @@
                 <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
                 <!--<i-input :value="searchText" i-class="search-input" maxLength="100" placeholder="搜索影片" />-->
                 <form action="">
-                    <input type="text" class="search-input" v-model="searchText" placeholder="搜索影片" @confirm="doSearch">
+                    <input type="text" class="search-input" v-model="searchText" placeholder="搜索附近的影院" @confirm="getCinemaList">
                 </form>
             </div>
         </div>
         <div class="cinema-select-container">
             <ul>
-                <li class="cinema-select-item relative" v-for="(item,index) in 10" :key="index">
-                    <h5 class="text-lg text-line-normal text-bold">万达影城(芳草地店)</h5>
-                    <div class="text-sm cinema-address">朝阳区东大桥路9号芳草地大厦Lg-26朝阳区东大桥路9号芳草地大厦Lg-26朝阳区东大桥</div>
-                    <div class="text-sm text-gray">379m</div>
+                <li class="cinema-select-item relative" v-for="(item,index) in cinemaList" :key="item.id" @click="selectCinema(item)">
+                    <h5 class="text-lg text-line-normal text-bold">{{item.name}}</h5>
+                    <div class="text-sm cinema-address">{{item.address}}</div>
+                    <div class="text-sm text-gray">{{item.distance}}m</div>
                     <div class="location-icon"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
                 </li>
             </ul>
         </div>
+        <i-toast id="toast" />
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
-            return {}
+            return {
+                city: '北京',
+                cinemaList: [],
+                page: 1,
+                limit: 10,
+                searchText: ''
+            }
         },
         methods: {
-
+            getCinemaList () {
+                this.$http.post(api.common.cinemaList, {
+                    keywords: this.searchText,
+                    city: this.city,
+                    limit: this.limit,
+                    page: this.page
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.cinemaList = res.data.data.cinemas
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            selectCinema (cinemaInfo) {
+                wx.setStorage({
+                    key: 'cinemaInfo',
+                    data: cinemaInfo
+                })
+                wx.navigateTo({
+                    url: '../index/main'
+                })
+            }
+        },
+        onShow () {
+            let that = this
+            wx.getStorage({
+                key: 'location',
+                success(res) {
+                    that.city = res.data.city.replace('市', '')
+                    that.getCinemaList()
+                },
+                fail () {
+                    that.getCinemaList()
+                }
+            })
         }
     }
 </script>

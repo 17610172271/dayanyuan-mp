@@ -3,6 +3,11 @@
     "i-row": "../../../static/iView/row/index",
     "i-col": "../../../static/iView/col/index",
     "i-icon": "../../../static/iView/icon/index",
-    "i-modal": "../../../static/iView/modal/index"
+    "i-modal": "../../../static/iView/modal/index",
+    "i-tab-bar": "../../../static/iView/tab-bar/index",
+    "i-tab-bar-item": "../../../static/iView/tab-bar-item/index",
+    "i-divider": "../../../static/iView/divider/index",
+    "i-load-more": "../../../static/iView/load-more/index",
+    "i-toast": "../../../static/iView/toast/index"
   }
 }

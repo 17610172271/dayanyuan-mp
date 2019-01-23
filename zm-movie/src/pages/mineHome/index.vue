@@ -1,9 +1,9 @@
 <template>
     <div class="mine-home">
         <div class="info-container relative">
-            <i-avatar i-class="mine-home-avatar" src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="large"></i-avatar>
+            <div class="mine-home-avatar"><open-data type="userAvatarUrl"></open-data></div>
             <div class="info-content">
-                <div class="text-xxlg">无敌荣荣鱼</div>
+                <div class="text-xxlg"><open-data type="userNickName"></open-data></div>
                 <div class="info-tel" v-if="false">187****3344</div>
                 <div v-else class="info-tel" style="color: #ef7008;" @click="modal=true">绑定手机号 <span class="info-tel-img"><img src="/static/img/invalid-name@3x.png" alt=""></span></div>
             </div>
@@ -19,6 +19,11 @@
             <div class="text-left text-dark m-t-sm text-xlg modal-padding">你的手机号码</div>
             <div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>
         </i-modal>
+        <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">
+            <i-tab-bar-item key="homepage" img="/static/img/ic-hot-nor@3x.png" current-img="/static/img/ic-hot-cat@3x.png" title="热映"></i-tab-bar-item>
+            <i-tab-bar-item key="code" icon="scan" current-icon="scan" title="扫码"></i-tab-bar-item>
+            <i-tab-bar-item key="mine" img="/static/img/ic-me-nor@3x.png" current-img="/static/img/ic-me@3x.png" title="我的"></i-tab-bar-item>
+        </i-tab-bar>
     </div>
 </template>
 
@@ -27,7 +32,8 @@
         data () {
             return {
                 modal: false,
-                telVal: '17610172271'
+                telVal: '17610172271',
+                currentTab: 'mine'
             }
         },
         methods: {
@@ -36,6 +42,23 @@
             },
             doCancel () {
                 this.modal = false
+            },
+            tabChange (detail) {
+                if (detail.mp.detail.key == 'code') {
+                    wx.scanCode({
+                        success(res) {
+                            console.log(res)
+                        }
+                    })
+                } else if (detail.mp.detail.key == 'mine') {
+                    wx.navigateTo({
+                        url: '../mineHome/main'
+                    })
+                } else {
+                    wx.navigateTo({
+                        url: '../index/main'
+                    })
+                }
             }
         }
     }

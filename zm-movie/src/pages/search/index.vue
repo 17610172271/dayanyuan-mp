@@ -9,51 +9,112 @@
                 </form>
             </div>
         </div>
-        <div class="m-t-xs p-o-sm" v-if="false">
+        <div class="m-t-xs p-o-sm" v-if="listShow">
             <div class="search-top-head text-line-normal text-gray text-md">热门搜索</div>
-            <div><span class="hot-search-item bg-eee" v-for="(item, index) in 10" :key="index">后来的外卖</span></div>
+            <div>
+                <span class="hot-search-item bg-eee" v-for="(item, index) in hotKeys" :key="index" @click="selectItem(item.word)">{{item.word}}</span>
+                <span class="hot-search-item bg-eee" v-if="hotKeys.length===0">暂无热门搜索</span>
+            </div>
             <div class="search-top-head text-line-normal text-gray text-md" style="margin-top: 30rpx;">历史搜索</div>
-            <div><span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index">{{item}}</span></div>
+            <div><span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index" @click="selectItem(item)">{{item}}</span></div>
         </div>
         <div class="search-result-container" v-else>
             <ul>
-                <li class="m-b-sm bg-white search-result-item relative" @click="nextPage" v-for="(item,index) in 5" :key="index">
-                    <div class="poster-container"></div>
-                    <h5 class="text-lg text-line-normal">后来的外卖</h5>
-                    <div class="text-sm text-gray text-line-20 m-t-sm">导演: 刘若英</div>
-                    <div class="text-sm text-gray text-line-20">主演: 周冬雨,井柏然</div>
-                    <div class="text-sm text-gray text-line-20">类型: 剧情,爱情 <span class="pull-right text-xs text-orange">32543次观看</span></div>
+                <li class="m-b-sm bg-white search-result-item relative" @click="nextPage(item.id)" v-for="(item,index) in data" :key="item.id">
+                    <div class="poster-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
+                    <h5 class="text-lg text-line-normal over-omit">{{item.film_name}}</h5>
+                    <div class="text-sm text-gray text-line-20 m-t-sm over-omit">导演: {{item.director}}</div>
+                    <div class="text-sm text-gray text-line-20 over-omit">主演: {{item.actor}}</div>
+                    <div class="text-sm text-gray text-line-20 over-omit">类型: {{item.clazz}} <span class="pull-right text-xs text-orange">{{item.viewer || 0}}次观看</span></div>
                 </li>
+                <li class="text-orange p-sm text-center" v-if="data.length===0">没有搜索到影片</li>
             </ul>
         </div>
+        <i-toast id="toast" />
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
             return {
+                listShow: true,
                 history: [],
-                searchText: ''
+                searchText: '',
+                data: [],
+                page: 1,
+                page_size: 1,
+                hotKeys: []
             }
         },
         methods: {
+            getList (type) {
+                this.$http.post(api.film.searchResult, {
+                    version: '1.0.0',
+                    title: this.searchText,
+                    page: this.page,
+                    page_size: this.page_size
+                }).then(res => {
+                    this.listShow = false
+                    if (res.data.code === 1) {
+                        if (type) {
+                            this.data = this.data.concat(res.data.data.films)
+                        } else {
+                            this.data = res.data.data.films
+                        }
+                    } else {
+                        this.data = []
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            getHotKeys () {
+                this.$http.post(api.film.hotKeys, {
+                    version: '1.0.0'
+                }).then(res => {
+                    if (res.data.code === 1) {
+                        this.hotKeys = res.data.data
+                    } else {
+                        this.hotKeys = []
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            selectItem (keywords) {
+                this.searchText = keywords
+                this.getList()
+            },
             doSearch () {
-                console.log(this.searchText)
+                this.getList()
                 this.history.push(this.searchText)
                 wx.setStorage({
                     key: 'history',
                     data: this.history
                 })
             },
-            nextPage () {
+            nextPage (id) {
                 wx.navigateTo({
-                    url: '../filmDetail/main'
+                    url: '../filmDetail/main?id=' + id
                 })
             }
         },
+        onReachBottom () {
+            this.page += 1
+            this.getList('more')
+        },
         onShow () {
+            this.listShow = true
+            this.data = []
+            this.searchText = ''
             let that = this
+            this.getHotKeys()
             wx.getStorage({
                 key: 'history',
                 success(res) {
@@ -105,7 +166,6 @@
     .poster-container {
         width: 140rpx;
         height: 200rpx;
-        border: 2rpx solid #000;
         position: absolute;
         top: 20rpx;
         left: 20rpx;

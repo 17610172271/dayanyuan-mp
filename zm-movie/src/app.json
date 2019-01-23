@@ -23,29 +23,12 @@
     "navigationBarTitleText": "热映",
     "navigationBarTextStyle": "black"
   },
-  "tabBar": {
-    "color": "#202020",
-    "selectedColor": "#ec5045",
-    "borderStyle": "#e4e4e4",
-    "list": [
-      {
-        "pagePath": "pages/index/main",
-        "text": "热映",
-        "iconPath": "/static/img/ic-hot-nor@3x.png",
-        "selectedIconPath": "/static/img/ic-hot-cat@3x.png"
-      },
-      {
-        "pagePath": "pages/bacode/main",
-        "text": "扫码",
-        "iconPath": "/static/img/ic-hot-cat@3x.png",
-        "selectedIconPath": "/static/img/ic-hot-cat@3x.png"
-      },
-      {
-        "pagePath": "pages/mineHome/main",
-        "text": "我的",
-        "iconPath": "/static/img/ic-me-nor@3x.png",
-        "selectedIconPath": "/static/img/ic-me@3x.png"
-      }
-    ]
+  "usingComponents": {
+    "i-toast": "../static/iView/toast/index"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于搜索附近的影院信息"
+    }
   }
 }

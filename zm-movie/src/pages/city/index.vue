@@ -2,30 +2,61 @@
     <div>
         <div class="current-city">
             <div class="current-city-head">当前定位城市</div>
-            <div class="current-city-body bg-white">北京</div>
+            <div class="current-city-body bg-white">{{city}}</div>
         </div>
         <div class="current-city">
             <div class="current-city-head">选择城市</div>
             <ul>
-                <li class="current-city-body bg-white" :class="{'text-orange': index==3}" v-for="(item, index) in cities" :key="index">
-                    {{item}}
-                    <i-icon type="success_fill" v-if="index==3" class="pull-right m-r-sm" size="22" color="#ffa726" />
+                <li class="current-city-body bg-white" :class="{'text-orange': item.city===city}" v-for="(item, index) in cities" :key="index">
+                    {{item.city}}
+                    <i-icon type="success_fill" v-if="item.city===city" class="pull-right m-r-sm" size="22" color="#ffa726" />
                 </li>
             </ul>
         </div>
+        <i-toast id="toast" />
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
             return {
-                cities: ['北京', '上海', '广州', '深圳', '重庆', '天津','北京', '上海', '广州', '深圳', '重庆', '天津','北京', '上海', '广州', '深圳', '重庆', '天津']
+                cities: [],
+                city: '北京市'
             }
         },
         methods: {
+            getcinemaList () {
+                this.$http.post(api.common.cityList, {
+                    version: '1.0.0'
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.cities = res.data.data.cities
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            getLocation () {
+                let that = this
+                wx.getStorage({
+                    key: 'location',
+                    success(res) {
+                        that.city = res.data.city || '北京市'
+                    },
+                    fail () {
+                        that.city = '北京市'
+                    }
+                })
+            }
         },
         onShow () {
+            this.getLocation()
+            this.getcinemaList()
         }
     }
 </script>

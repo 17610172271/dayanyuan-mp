@@ -1,10 +1,10 @@
 <template>
     <div class="search-result-container border-top">
         <div class="m-b-sm bg-white search-result-item relative">
-            <div class="poster-container"></div>
-            <h5 class="text-lg text-line-normal">后来的外卖 <span class="text-sm text-gray">2018年5月17日 12:24:54</span></h5>
-            <div class="text-sm text-dark text-line-20 m-t-xs">一号影仓</div>
-            <div class="text-sm text-gray text-line-20 m-t-xs">北京市东城区崇文门外大街40号</div>
+            <div class="poster-container"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
+            <h5 class="text-lg text-line-normal">{{filmInfo.film_name}} <span class="text-sm text-gray">2018年5月17日 12:24:54</span></h5>
+            <div class="text-sm text-dark text-line-20 m-t-xs">{{cinema_name}}</div>
+            <div class="text-sm text-gray text-line-20 m-t-xs">{{cinema_address}}</div>
         </div>
         <div class="comment-content bg-white p-v-md p-o-sm border-bottom">
             <ul>
@@ -27,21 +27,48 @@
             </ul>
         </div>
         <div class="p-sm text-gray text-sm bg-white">为了给您带来更好的服务，吐槽一下影仓的亮点和不足吧～</div>
+        <i-toast id="toast" />
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
             return {
                 valOne: 5,
                 valTwo: 5,
                 valThree: 5,
-                valFour: 5
+                valFour: 5,
+                filmInfo: {},
+                cinema_name: '',
+                cinema_address: '',
+                trade_start_time: ''
             }
         },
         methods: {
-
+            getFilmInfo (id) {
+                if (!id) return
+                this.$http.post(api.film.detail, {
+                    version: '1.0.0',
+                    film_id: id
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.filmInfo = res.data.data
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+        },
+        onLoad (option) {
+            this.getFilmInfo(option.film_id)
+            this.cinema_name = option.cinema_name
+            this.cinema_address = option.cinema_address
+            this.trade_start_time = option.trade_start_time
         }
     }
 </script>
@@ -51,13 +78,11 @@
         background-color: #f5f5f5;
     }
     .search-result-item {
-        height: 200rpx;
-        padding: 20rpx 20rpx 20rpx 190rpx;
+        padding: 20rpx 20rpx 20rpx 140rpx;
     }
     .poster-container {
         width: 100rpx;
         height: 144rpx;
-        border: 2rpx solid #000;
         position: absolute;
         top: 20rpx;
         left: 20rpx;

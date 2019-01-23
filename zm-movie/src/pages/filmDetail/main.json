@@ -1,6 +1,7 @@
 {
-  "navigationBarTitleText": "选择影片",
+  "navigationBarTitleText": "选择影院",
   "usingComponents": {
-    "i-icon": "../../../static/iView/icon/index"
+    "i-icon": "../../../static/iView/icon/index",
+    "i-toast": "../../../static/iView/toast/index"
   }
 }

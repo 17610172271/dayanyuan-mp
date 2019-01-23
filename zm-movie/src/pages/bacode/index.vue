@@ -1,5 +1,5 @@
 <template>
-    <div class="bordr-top">
+    <div class="bordr-top" v-show="resultShow">
         <!--扫码中-->
         <div v-if="false">
             <div class="lock-img"></div>
@@ -22,10 +22,19 @@
 <script>
     export default {
         data () {
-            return {}
+            return {
+                resultShow: false
+            }
         },
         methods: {
 
+        },
+        onShow () {
+            wx.scanCode({
+                success(res) {
+                    console.log(res)
+                }
+            })
         }
     }
 </script>

@@ -523,8 +523,9 @@ textarea {
     height: 136rpx !important;
     border-radius: 50% !important;
     position: absolute;
-    top: 0rpx;
-    left: 0rpx;
+    top: 40rpx;
+    left: 24rpx;
+    overflow: hidden;
 }
 .tel-modal {
     text-align: left;
@@ -546,6 +547,13 @@ textarea {
     color: rgba(42, 42, 42, 0.87);
     border: 2rpx solid #bcbcbc;
     border-radius: 12rpx;
+}
+.devide-container {
+    margin-bottom: 100rpx !important;
+}
+.slide-image {
+    width: 100%;
+    height: 100%;
 }
 
 
