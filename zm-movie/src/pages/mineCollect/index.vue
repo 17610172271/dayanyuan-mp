@@ -37,7 +37,7 @@
                     page_size: this.page_size
                 }, {
                     headers: {
-                        'AuthToken': 'ntPgSqdhiNyShvWPiFGhQzNFHzjXSuSr'
+                        'AuthToken': this.userInfo.auth_token
                     }
                 }).then((res) => {
                     if (res.data.code === 1) {
@@ -70,7 +70,7 @@
                     film_id: item.id
                 }, {
                     headers: {
-                        'AuthToken': 'ntPgSqdhiNyShvWPiFGhQzNFHzjXSuSr'
+                        'AuthToken': this.userInfo.auth_token
                     }
                 }).then((res) => {
                     if (res.data.code === 1) {
@@ -92,8 +92,18 @@
             this.page += 1
             this.getList('more')
         },
-        onShow () {
-            this.getList()
+        onLoad (option) {
+            let that = this
+            wx.getStorage({
+                key: 'userInfo',
+                success(res) {
+                    that.userInfo = res.data
+                    that.getList(option.id)
+                },
+                fail () {
+                    that.userInfo = {}
+                }
+            })
         }
     }
 </script>

@@ -11,7 +11,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx139121431ea0f44c",
+	"appid": "wx347dbabad1eb49da",
 	"projectname": "zm-movie",
 	"condition": {
 		"search": {

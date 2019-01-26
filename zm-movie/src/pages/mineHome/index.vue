@@ -15,10 +15,13 @@
                 <i-cell title="我的设备" i-class="border-bottom" is-link url="/pages/mineDevice/main"></i-cell>
             </i-cell-group>
         </div>
-        <i-modal i-class="tel-modal" title="大眼猿 申请获得" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">
-            <div class="text-left text-dark m-t-sm text-xlg modal-padding">你的手机号码</div>
+        <i-modal-normal i-class="tel-modal" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">
+            <h5 class="text-md text-dark text-left p-o-md text-bold" style="margin-bottom: 30rpx;">大眼猿 申请获得</h5>
+            <div class="text-left text-dark m-t-sm text-xlg p-l-md text-bold">你的手机号码</div>
             <div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>
-        </i-modal>
+            <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">获取手机号</button>
+            <div class="p-o-md" style="margin-top: 30rpx;"><a href="/pages/mineTel/main?page=mineHome" class="text-orange text-lg text-left">使用其他手机号登录</a></div>
+        </i-modal-normal>
         <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">
             <i-tab-bar-item key="homepage" img="/static/img/ic-hot-nor@3x.png" current-img="/static/img/ic-hot-cat@3x.png" title="热映"></i-tab-bar-item>
             <i-tab-bar-item key="code" icon="scan" current-icon="scan" title="扫码"></i-tab-bar-item>
@@ -31,12 +34,15 @@
     export default {
         data () {
             return {
-                modal: false,
+                modal: true,
                 telVal: '17610172271',
                 currentTab: 'mine'
             }
         },
         methods: {
+            getPhoneNumber (e) {
+                console.log(e)
+            },
             doOk () {
                 this.modal = false
             },
@@ -60,6 +66,21 @@
                     })
                 }
             }
+        },
+        onLoad () {
+            const accountInfo = wx.getAccountInfoSync()
+            console.log('appid:', accountInfo.miniProgram.appId) // 小程序 appId
+            wx.checkSession({
+                success() {
+                    console.log('未过期')
+                    // session_key 未过期，并且在本生命周期一直有效
+                },
+                fail() {
+                    console.log('已过期')
+                    // session_key 已经失效，需要重新执行登录流程
+                    wx.login() // 重新登录
+                }
+            })
         }
     }
 </script>

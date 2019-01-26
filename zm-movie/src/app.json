@@ -1,11 +1,13 @@
 {
   "pages": [
     "pages/index/main",
+    "pages/mineTel/main",
+    "pages/mineHome/main",
+
     "pages/bacode/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
     "pages/mineCollect/main",
-    "pages/mineHome/main",
     "pages/cinema/main",
     "pages/counter/main",
     "pages/city/main",

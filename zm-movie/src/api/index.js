@@ -5,6 +5,13 @@
 export const common = {
     cityList: '/api/v1/cinema/cities', // 城市列表
     cinemaList: '/api/v1/cinema/search', // 搜索-影院列表
+    cinemaDetail: '/api/v1/cinema/detail', // 影院详情
+    timeList: '/api/v1/cinema/hall_times', // 影院占用时间表
+    pay: '/api/v1/pay/wechat', // 微信支付
+    sendCode: '/api/v1/account/sms/send', // 发送短信验证码
+    editTel: '/api/v1/account/mobile/binding', // 绑定手机号
+    login: '/api/v1/account/login/unionProgram', // 微信第三方登录
+    open: '/api/v1/device/open', // 扫码入舱
 }
 // 影片
 export  const film = {
@@ -27,8 +34,16 @@ export  const mine = {
     closeOrder: '/api/v1/order/close', // 关闭订单
     deviceStatus: '/api/v1/device/status', // 设备状态
 }
+// 订单
+export  const order = {
+    create: '/api/v1/order/create', // 创建订单
+    detail: '/api/v1/order/detail', // 订单详情
+    cancel: '/api/v1/order/close', // 取消订单
+    comment: '/api/v1/profile/post_movie_evaluate', // 提交评价
+}
 export default {
     common,
     film,
-    mine
+    mine,
+    order
 }

@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="border-top">
         <!--搜索-->
-        <div class="home-top-container bg-white relative">
-            <a href="/pages/city/main" class="city-select">{{city}}<i-icon type="unfold" size="14" style="margin-left: 6rpx;" color="#030303" /></a>
+        <div class="home-top-container bg-white relative m-t-sm">
+            <a href="/pages/city/main" class="city-select"><span class="city-index-container">{{city}}</span><i-icon type="unfold" size="14" color="#030303" /></a>
             <div class="search-box" style="margin-top: 2rpx;" @click="goSearch">
                 <i-icon type="search" size="16" color="#ffa726" />
                 搜索影片
@@ -29,9 +29,12 @@
             </block>
         </swiper>
         <!--分类-->
-        <scroll-view scroll-x class="hotplay-title-container">
-            <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @click="selectClass(item.category)">{{item.category}}</span>
-        </scroll-view>
+        <div class="scroll-x-container">
+            <scroll-view scroll-x class="hotplay-title-container">
+                <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @click="selectClass(item.category)">{{item.category}}</span>
+            </scroll-view>
+        </div>
+
         <div>
             <scroll-view scroll-x class="hotplay-container">
                 <div class="image-container" v-for="(item, index) in selectedClassList" :key="item.id" @click="selectCinema(item.id)">
@@ -54,7 +57,7 @@
                     </div>
                 </div>
             </div>
-            <div class="m-t-sm p-o-sm">
+            <div class="m-t-sm p-o-sm p-b-lg">
                 <i-row>
                     <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @click="selectCinema(item.id)">
                         <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
@@ -67,8 +70,8 @@
                     </i-col>
                 </i-row>
             </div>
-            <div class="p-sm" v-show="loading || divideShow">
-                <i-load-more i-class="devide-container" tip="没有更多数据了" :loading="loading" />
+            <div class="p-sm" v-show="loading">
+                <i-load-more i-class="devide-container" tip="上拉加载更多" :loading="loading" />
             </div>
         </div>
         <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
@@ -107,6 +110,7 @@
 
 <script type="text/ecmascript-6">
 import api from '@/api'
+
 export default {
     data () {
         return {
@@ -119,7 +123,7 @@ export default {
             recommend: {},
             moreList: [],
             page: 1,
-            page_size: 12,
+            page_size: 30,
             loading: true,
             divideShow: false,
             currentTab: 'homepage',
@@ -246,10 +250,38 @@ export default {
             this.modal4 = false
         },
         tabChange (detail) {
+            let that = this
             if (detail.mp.detail.key == 'code') {
+                // 扫码开舱
                 wx.scanCode({
                     success(res) {
-                        console.log(res)
+                        let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
+                        that.$http.post(api.common.open, {
+                            version: '1.0.0',
+                            hall_id: hall_id
+                        }, {
+                            headers: {
+                                'AuthToken': 'ntPgSqdhiNyShvWPiFGhQzNFHzjXSuSr'
+                            }
+                        }).then((res) => {
+                            if (res.data.code === 1) {
+                                // 允许控制
+                                wx.navigateTo({
+                                    url: '../bacode/main?'
+                                })
+                            } else if (res.data.code === 0) {
+                                that.modal = true
+                            } else if (res.data.code === 2) {
+                                that.modal2 = true
+                            } else if (res.data.code === 3) {
+                                that.modal1 = true
+                            } else {
+                                that.$Toast({
+                                    content: res.data.msg,
+                                    type: 'error'
+                                })
+                            }
+                        })
                     }
                 })
             } else if (detail.mp.detail.key == 'mine') {
@@ -274,10 +306,21 @@ export default {
                 }
             })
         },
-        getUserInfo () {
-            wx.getUserInfo({
+        getCity () {
+            let that = this
+            wx.getStorage({
+                key: 'location',
                 success(res) {
-                    console.log(res)
+                    that.city = res.data.city || '北京'
+                    that.city = that.city.replace('市', '')
+                    if (that.city.length > 2) {
+                        that.city = that.city.slice(0, 2) + '..'
+                    } else {
+                        that.city = that.city
+                    }
+                },
+                fail () {
+                    that.city = '北京'
                 }
             })
         }
@@ -287,31 +330,44 @@ export default {
         this.getMoreList()
     },
     onShow () {
-        this.getData()
-        this.getCinemaInfo()
+
+    },
+    created () {
+        let that = this
+        wx.login({
+            success: function(res) {
+                if (res.code) {
+                    console.log(res.code)
+                    that.$http.post(api.common.login, {
+                        version: '1.0.0',
+                        device_no: res.code,
+                        platform: 'wx',
+                        openid: res.code
+                    }).then((res) => {
+                        if (res.data.code === 1) {
+                            wx.setStorage({
+                                key: 'userInfo',
+                                data: res.data.data
+                            })
+                        } else {
+                            that.$Toast({
+                                content: res.data.msg,
+                                type: 'error'
+                            })
+                        }
+                    })
+                }
+            }
+        })
     },
     onLoad () {
-//        获取appId
-        let accountInfo = wx.getAccountInfoSync()
-        wx.setStorage({
-            key: 'appId',
-            data: accountInfo.miniProgram.appId
-        })
+        this.getData()
+        this.getCinemaInfo()
+        this.getCity()
         let that = this
 //        获取用户信息及地理位置授权并存储城市位置信息
         wx.getSetting({
             success(res) {
-//                获取用户资料
-                if (res.authSetting['scope.userInfo']) {
-                    that.getUserInfo()
-                } else {
-                    wx.authorize({
-                        scope: 'scope.userLocation',
-                        success () {
-                            that.getUserInfo()
-                        }
-                    })
-                }
 //                获取位置信息
                 if (!res.authSetting['scope.userLocation']) {
                     wx.authorize({
@@ -330,9 +386,11 @@ export default {
                                             data: {
                                                 location: location,
                                                 city: city,
+                                                locationCity: city,
                                                 city_id: id
                                             }
                                         })
+                                        that.city = that.city.replace('市', '')
                                         that.$http.post(api.common.cityList, {
                                             version: '1.0.0'
                                         }).then((res) => {
@@ -345,9 +403,11 @@ export default {
                                                             data: {
                                                                 location: location,
                                                                 city: city,
+                                                                locationCity: city,
                                                                 city_id: id
                                                             }
                                                         })
+                                                        that.city = that.city.replace('市', '')
                                                     }
                                                 })
                                             }
@@ -360,6 +420,9 @@ export default {
                 }
             }
         })
+    },
+    onLaunch () {
+
     }
 }
 </script>
@@ -386,7 +449,11 @@ export default {
         width: 100%;
         height: 364rpx;
     }
+    .scroll-x-container {
+        overflow-x: hidden;
+    }
     .hotplay-title-container {
+        width: 100%;
         padding: 34rpx 18rpx 32rpx 18rpx;
         line-height: 48rpx;
         white-space: nowrap;
@@ -458,5 +525,8 @@ export default {
         top: 20rpx;
         right: 20rpx;
     }
-
+    .city-index-container {
+        max-width: 80rpx;
+        display: inline-block;
+    }
 </style>

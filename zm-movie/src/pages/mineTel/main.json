@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "添加手机号",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index",
+    "i-input": "../../../static/iView/input/index"
+  }
+}

@@ -2,6 +2,7 @@
   "navigationBarTitleText": "选择时间",
   "usingComponents": {
     "i-icon": "../../../static/iView/icon/index",
+    "i-modal-normal": "../../../static/iView/modal-normal/index",
     "i-tabs": "../../../static/iView/tabs/index",
     "i-tab": "../../../static/iView/tab/index"
   }

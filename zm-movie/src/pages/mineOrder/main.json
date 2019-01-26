@@ -4,6 +4,10 @@
     "i-icon": "../../../static/iView/icon/index",
     "i-button": "../../../static/iView/button/index",
     "i-tabs": "../../../static/iView/tabs/index",
-    "i-tab": "../../../static/iView/tab/index"
+    "i-tab": "../../../static/iView/tab/index",
+    "i-count-down": "../../../static/iView/count-down/index",
+    "i-modal": "../../../static/iView/modal/index",
+    "i-modal-normal": "../../../static/iView/modal-normal/index",
+    "i-spin": "../../../static/iView/spin/index"
   }
 }

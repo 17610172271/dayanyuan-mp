@@ -2,12 +2,12 @@
     <div>
         <div class="current-city">
             <div class="current-city-head">当前定位城市</div>
-            <div class="current-city-body bg-white">{{city}}</div>
+            <div class="current-city-body bg-white">{{locationCity}}</div>
         </div>
         <div class="current-city">
             <div class="current-city-head">选择城市</div>
             <ul>
-                <li class="current-city-body bg-white" :class="{'text-orange': item.city===city}" v-for="(item, index) in cities" :key="index">
+                <li class="current-city-body bg-white" :class="{'text-orange': item.city===city}" v-for="(item, index) in cities" :key="index" @click="selectCity(item)">
                     {{item.city}}
                     <i-icon type="success_fill" v-if="item.city===city" class="pull-right m-r-sm" size="22" color="#ffa726" />
                 </li>
@@ -23,7 +23,9 @@
         data () {
             return {
                 cities: [],
-                city: '北京市'
+                city: '北京市',
+                locationCity: '北京市',
+                location: ''
             }
         },
         methods: {
@@ -41,12 +43,28 @@
                     }
                 })
             },
+            selectCity (item) {
+                wx.setStorage({
+                    key: 'location',
+                    data: {
+                        location: this.location,
+                        city: item.city,
+                        locationCity: this.locationCity,
+                        city_id: item.id
+                    }
+                })
+                wx.navigateTo({
+                    url: '../index/main'
+                })
+            },
             getLocation () {
                 let that = this
                 wx.getStorage({
                     key: 'location',
                     success(res) {
                         that.city = res.data.city || '北京市'
+                        that.location = res.data.location
+                        that.locationCity = res.data.locationCity
                     },
                     fail () {
                         that.city = '北京市'

@@ -10,23 +10,26 @@
             <ul>
                 <li class="p-v-xs clear">
                     <span class="pull-left text-sm comments-text border">环境整洁干净</span>
-                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valOne"></i-rate>
+                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valOne" @change="envChange"></i-rate>
                 </li>
                 <li class="p-v-xs clear">
                     <span class="pull-left text-sm comments-text border">座椅舒适</span>
-                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valTwo"></i-rate>
+                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valTwo" @change="seatChange"></i-rate>
                 </li>
                 <li class="p-v-xs clear">
                     <span class="pull-left text-sm comments-text border">灯光效果</span>
-                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valThree"></i-rate>
+                    <i-rate size="24" i-class="pull-right p-v-xs" v-model="valThree" @change="lightChange"></i-rate>
                 </li>
                 <li class="p-v-xs clear">
                     <span class="pull-left text-sm comments-text border">音响效果</span>
-                    <i-rate size="24" i-class="pull-right p-v-xs comments" v-model="valFour"></i-rate>
+                    <i-rate size="24" i-class="pull-right p-v-xs comments" v-model="valFour" @change="soundChange"></i-rate>
                 </li>
             </ul>
         </div>
         <div class="p-sm text-gray text-sm bg-white">为了给您带来更好的服务，吐槽一下影仓的亮点和不足吧～</div>
+        <div class="text-center film-detail-btn">
+            <buttom class="select-time-btn text-center" @click="doComment">提交评价</buttom>
+        </div>
         <i-toast id="toast" />
     </div>
 </template>
@@ -43,7 +46,9 @@
                 filmInfo: {},
                 cinema_name: '',
                 cinema_address: '',
-                trade_start_time: ''
+                trade_start_time: '',
+                trade_id: '',
+                userInfo: {}
             }
         },
         methods: {
@@ -51,7 +56,8 @@
                 if (!id) return
                 this.$http.post(api.film.detail, {
                     version: '1.0.0',
-                    film_id: id
+                    film_id: id,
+                    user_id: this.userInfo.user_id
                 }).then((res) => {
                     if (res.data.code === 1) {
                         this.filmInfo = res.data.data
@@ -63,12 +69,64 @@
                     }
                 })
             },
+            envChange (e) {
+                this.valOne = e.target.index
+            },
+            seatChange (e) {
+                this.valTwo = e.target.index
+            },
+            lightChange (e) {
+                this.valThree = e.target.index
+            },
+            soundChange (e) {
+                this.valFour = e.target.index
+            },
+            doComment () {
+                this.$http.post(api.order.comment, {
+                    version: '1.0.0',
+                    trade_id: this.trade_id,
+                    evn: this.valOne,
+                    seat: this.valTwo,
+                    light: this.valThree,
+                    sound: this.valFour
+                }, {
+                    headers: {
+                        'AuthToken': this.userInfo.auth_token
+                    }
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.$Toast({
+                            content: '提交成功',
+                            type: 'success'
+                        })
+                        wx.navigateTo({
+                            url: '../mineOrder/main'
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            }
         },
         onLoad (option) {
-            this.getFilmInfo(option.film_id)
+            let that = this
+            this.trade_id = option.trade_id
             this.cinema_name = option.cinema_name
             this.cinema_address = option.cinema_address
             this.trade_start_time = option.trade_start_time
+            wx.getStorage({
+                key: 'userInfo',
+                success(res) {
+                    that.userInfo = res.data
+                    that.getFilmInfo(option.film_id)
+                },
+                fail () {
+                    that.userInfo = {}
+                }
+            })
         }
     }
 </script>
@@ -92,5 +150,11 @@
         display: inline-block;
         padding: 16rpx 30rpx;
         border-radius: 32rpx;
+    }
+    .film-detail-btn {
+        position: absolute;
+        bottom: 150rpx;
+        left: 50%;
+        transform: translateX(-50%);
     }
 </style>

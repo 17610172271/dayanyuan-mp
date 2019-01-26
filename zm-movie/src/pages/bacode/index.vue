@@ -1,7 +1,7 @@
 <template>
-    <div class="bordr-top" v-show="resultShow">
+    <div class="bordr-top">
         <!--扫码中-->
-        <div v-if="false">
+        <div v-if="status">
             <div class="lock-img"></div>
             <div class="progress-container">
                 <div class="progress-orange"></div>
@@ -23,18 +23,22 @@
     export default {
         data () {
             return {
-                resultShow: false
+                status: true
             }
         },
         methods: {
 
         },
-        onShow () {
-            wx.scanCode({
-                success(res) {
-                    console.log(res)
-                }
-            })
+        onLoad () {
+            let that = this
+            setTimeout(function () {
+                that.status = false
+            }, 1000)
+            setTimeout(function () {
+                wx.navigateTo({
+                    url: '../mineDevice/main?'
+                })
+            },3000)
         }
     }
 </script>
