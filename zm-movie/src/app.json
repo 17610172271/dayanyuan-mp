@@ -3,7 +3,6 @@
     "pages/index/main",
     "pages/mineTel/main",
     "pages/mineHome/main",
-
     "pages/bacode/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
@@ -23,7 +22,8 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "热映",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": false
   },
   "usingComponents": {
     "i-toast": "../static/iView/toast/index"
@@ -32,5 +32,7 @@
     "scope.userLocation": {
       "desc": "你的位置信息将用于搜索附近的影院信息"
     }
-  }
+  },
+  "enablePullDownRefresh": false,
+  "disableScroll": true
 }

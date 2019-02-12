@@ -568,5 +568,16 @@ textarea {
     color: #fff;
     font-size: 28rpx;
 }
+.collect-btn {
+    display: block;
+    outline: none;
+    border: 0;
+    background-color: #fff;
+}
+.collect-btn::after {
+    display: block;
+    outline: none;
+    border: 0;
+}
 
 

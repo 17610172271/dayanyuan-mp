@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="min-height: 100%;"@touchstart='touchStart' @touchend="touchEnd">
         <i-tabs :current="current" @change="tabChange" color="#f98d0f">
             <i-tab key="unused" class="width-50" title="未使用"></i-tab>
             <i-tab key="all" class="width-50" title="全部"></i-tab>
@@ -28,18 +28,18 @@
                             ></i-count-down>
                         </span>
                     </div>
-                    <div class="text-xs text-gray" style="margin-top: 30rpx;">2018年5月20日 12:00-14:00</div>
+                    <div class="text-xs text-gray" style="margin-top: 30rpx;">{{item.play_time}}</div>
                     <div style="margin-top: 30rpx;" class="clear">
                         <span class="text-orange">{{item.trade_status===0 ? '未支付' : (item.trade_status===1 ? '未使用' : '已使用')}}</span>
                         <div class="pull-right clear" v-if="item.trade_status===0">
-                            <i-button type="ghost" size="small" i-class="btn-order pull-left m-r-8" @click="cancelPay(item.trade_id)">取消支付</i-button>
-                            <i-button type="warning" size="small" i-class="btn-order pull-left" @click="goPay(item.trade_id)">立即支付</i-button>
+                            <i-button type="ghost" size="small" i-class="btn-order pull-left m-r-8" @tap="cancelPay(item.trade_id)">取消支付</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="goPay(item.trade_id)">立即支付</i-button>
                         </div>
                         <div class="pull-right clear" v-else-if="item.trade_status===1">
-                            <i-button type="warning" size="small" i-class="btn-order pull-left">扫码入舱</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="openHall()">扫码入舱</i-button>
                         </div>
                         <div class="pull-right clear" v-else>
-                            <i-button type="warning" size="small" i-class="btn-order pull-left" @click="doComments(item)">评价</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="doComments(item)">评价</i-button>
                         </div>
                     </div>
                 </div>
@@ -47,28 +47,51 @@
 
             <div v-if="data.length===0 && !loading" class="text-gray text-center">你暂时没有订单</div>
         </div>
-        <i-modal-normal i-class="notice-modal" :visible="modal" ok-text="确定" cancel-text="取消" @ok="cancelOrder" @cancel="modal=false">
+        <i-modal-normal i-class="notice-modal" :visible="modal0" ok-text="确定" cancel-text="取消" @ok="cancelOrder" @cancel="modal0=false">
             <div class="notice-modal-container">
                 <div class="p-v-sm">您确定要取消该订单吗?</div>
             </div>
         </i-modal-normal>
+        <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk1" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo.hall_name}}</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="知道了" cancel-text="再来一单" @ok="doOk2" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+            </div>
+        </i-modal>
+
         <i-toast id="toast" />
     </div>
 </template>
 
 <script type="text/ecmascript-6">
     import api from '@/api'
+    import format from '@/utils/format'
     export default {
         data () {
             return {
-                current: 'unused',
+                current: 'all',
                 data: [],
                 page: 1,
                 page_size: 10,
-                modal: false,
+                modal0: false,
                 id: '',
                 loading: false,
-                userInfo: {}
+                userInfo: {},
+                modal: false,
+                modal1: false,
+                modal2: false,
+                orderInfo: {},
+                startX: 0,
+                startY: 0
             }
         },
         methods: {
@@ -94,14 +117,16 @@
                             this.data = this.data.concat(res.data.data.orders).map(val => {
                                 return {
                                     ...val,
-                                    effective_time: new Date().getTime() + val.effective_time * 1000
+                                    effective_time: new Date().getTime() + val.effective_time * 1000,
+                                    play_time: this.format(val.trade_start_time, val.trade_end_time)
                                 }
                             })
                         } else {
                             this.data = res.data.data.orders.map(val => {
                                 return {
                                     ...val,
-                                    effective_time: new Date().getTime() + val.effective_time * 1000
+                                    effective_time: new Date().getTime() + val.effective_time * 1000,
+                                    play_time: this.format(val.trade_start_time, val.trade_end_time)
                                 }
                             })
                         }
@@ -115,7 +140,6 @@
             },
             tabChange (detail) {
                 this.current = detail.target.key
-                this.getList()
             },
             doComments (item) {
                 wx.navigateTo({
@@ -124,9 +148,11 @@
                 })
             },
             goPay (trade_id) {
+                let that = this
                 this.$http.post(api.common.pay, {
                     version: '1.0.0',
-                    trade_id: trade_id
+                    trade_id: trade_id,
+                    openid: 'otFW15HNFGpGbq6bII1Tl-mCB91s'
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token
@@ -134,16 +160,30 @@
                 }).then((res) => {
                     if (res.data.code === 1) {
                         wx.requestPayment({
-                            timeStamp: res.data.data.timestamp,
-                            nonceStr: res.data.data.noncestr,
+                            timeStamp: res.data.data.timeStamp,
+                            nonceStr: res.data.data.nonceStr,
                             package: res.data.data.package,
-                            signType: 'MD5',
-                            paySign: res.data.data.sign,
+                            signType: res.data.data.signType,
+                            paySign: res.data.data.paySign,
                             success(res) {
-                                console.log(res)
+                                if (res.errMsg === 'requestPayment:ok') {
+                                    that.$Toast({
+                                        content: '支付成功',
+                                        type: 'success'
+                                    })
+                                    that.current = 'all'
+                                } else {
+                                    that.$Toast({
+                                        content: res.errMsg,
+                                        type: 'error'
+                                    })
+                                }
                             },
                             fail(res) {
-                                console.log(res)
+                                that.$Toast({
+                                    content: res.errMsg,
+                                    type: 'error'
+                                })
                             }
                         })
                     } else {
@@ -154,10 +194,50 @@
                     }
                 })
             },
+            openHall () {
+                let that = this
+                // 扫码开舱
+                wx.scanCode({
+                    success(res) {
+                        let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
+                        that.$http.post(api.common.open, {
+                            version: '1.0.0',
+                            hall_id: hall_id
+                        }, {
+                            headers: {
+                                'AuthToken': that.userInfo.auth_token
+                            }
+                        }).then((res) => {
+                            if (res.data.code === 1) {
+                                // 允许控制
+                                wx.navigateTo({
+                                    url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data.trade_id
+                                })
+                            } else if (res.data.code === 0) {
+                                that.modal = true
+                                that.orderInfo = res.data.data[0]
+                            } else if (res.data.code === 2) {
+                                that.modal2 = true
+                                that.orderInfo = res.data.data[0]
+                                that.$set(that.orderInfo, 'count_down', parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60))
+                            } else if (res.data.code === 3) {
+                                that.modal1 = true
+                                that.orderInfo = res.data.data[0]
+                            } else {
+                                that.$Toast({
+                                    content: res.data.msg,
+                                    type: 'error'
+                                })
+                            }
+                        })
+                    }
+                })
+            },
             cancelPay (id) {
                 this.id = id
-                this.modal = true
+                this.modal0 = true
             },
+            format: format,
             cancelOrder () {
                 this.$http.post(api.order.cancel, {
                     trade_id: this.id
@@ -167,7 +247,7 @@
                     }
                 }).then((res) => {
                     if (res.data.code === 1) {
-                        this.modal = false
+                        this.modal0 = false
                         this.$Toast({
                             content: '订单取消成功',
                             type: 'success'
@@ -180,6 +260,33 @@
                         })
                     }
                 })
+            },
+            doOk () {
+                this.modal = false
+            },
+            doCancel () {
+                this.modal = false
+                this.modal1 = false
+                this.modal2 = false
+            },
+            doOk1 () {
+                this.modal1 = false
+            },
+            doOk2 () {
+                this.modal2 = false
+            },
+            touchStart (e) {
+                this.startX = e.mp.changedTouches[0].clientX
+                this.startY = e.mp.changedTouches[0].clientY
+            },
+            touchEnd (e) {
+                let endX = e.mp.changedTouches[0].clientX
+                let endY = e.mp.changedTouches[0].clientY
+                if (endX - this.startX > 50 && Math.abs(endY - this.startY) < 50) {      //右滑
+                    this.current = 'unused'
+                } else if (endX - this.startX < -50 && Math.abs(endY - this.startY) < 50) {   //左滑
+                    this.current = 'all'
+                }
             }
         },
         onReachBottom () {
@@ -198,6 +305,11 @@
                     that.userInfo = {}
                 }
             })
+        },
+        watch: {
+            current () {
+                this.getList()
+            }
         }
     }
 </script>

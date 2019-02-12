@@ -3,14 +3,14 @@
         <div>
             <div class="relative">
                 <i-input :value="tel" title="手机号码" :error="telError" type="number" autofocus placeholder="输入有效手机号" @blur="validateTel" @change="telChange"></i-input>
-                <div class="btn-code" v-if="codeText==0" @click="getCode">获取验证码</div>
+                <div class="btn-code" v-if="codeText==0" @tap="getCode">获取验证码</div>
                 <div class="btn-code" v-else>{{codeText}}秒</div>
             </div>
             <div class="relative">
                 <i-input :value="code" title="验证码" placeholder="输入验证码"></i-input>
             </div>
             <div class="text-center film-detail-btn">
-                <buttom class="select-time-btn text-center" @click="submit">完成</buttom>
+                <buttom class="select-time-btn text-center" @tap="submit">完成</buttom>
             </div>
         </div>
         <i-toast id="toast" />

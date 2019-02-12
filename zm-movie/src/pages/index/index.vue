@@ -3,7 +3,7 @@
         <!--搜索-->
         <div class="home-top-container bg-white relative m-t-sm">
             <a href="/pages/city/main" class="city-select"><span class="city-index-container">{{city}}</span><i-icon type="unfold" size="14" color="#030303" /></a>
-            <div class="search-box" style="margin-top: 2rpx;" @click="goSearch">
+            <div class="search-box" style="margin-top: 2rpx;" @tap="goSearch">
                 <i-icon type="search" size="16" color="#ffa726" />
                 搜索影片
             </div>
@@ -31,13 +31,13 @@
         <!--分类-->
         <div class="scroll-x-container">
             <scroll-view scroll-x class="hotplay-title-container">
-                <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @click="selectClass(item.category)">{{item.category}}</span>
+                <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @tap="selectClass(item.category)">{{item.category}}</span>
             </scroll-view>
         </div>
 
         <div>
             <scroll-view scroll-x class="hotplay-container">
-                <div class="image-container" v-for="(item, index) in selectedClassList" :key="item.id" @click="selectCinema(item.id)">
+                <div class="image-container" v-for="(item, index) in selectedClassList" :key="item.id" @tap="selectCinema(item.id)">
                     <div class="image-item-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                     <div class="title-text title-p over-omit">{{item.title}}</div>
                     <div class="subtitle-text p-l-sm">{{item.viewer || 0}}次观看</div>
@@ -49,7 +49,7 @@
         <div>
             <h3 class="day-recommend">每日推荐·你想看的都在这里</h3>
             <div>
-                <div class="first-image-container" @click="selectCinema(recommend.id)">
+                <div class="first-image-container" @tap="selectCinema(recommend.id)">
                     <div class="first-image"><image :src="recommend.image_url" class="slide-image" mode="widthFix"></image></div>
                     <div>
                         <div class="title-text m-t-sm p-l-sm">{{recommend.title}}</div>
@@ -59,7 +59,7 @@
             </div>
             <div class="m-t-sm p-o-sm p-b-lg">
                 <i-row>
-                    <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @click="selectCinema(item.id)">
+                    <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @tap="selectCinema(item.id)">
                         <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
                             <div class="recommend-image-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                             <div>
@@ -75,28 +75,18 @@
             </div>
         </div>
         <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
-            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
                 <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal1" ok-text="知道了" cancel-text="去导航" @ok="doOk1" @cancel="doCancel">
-            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
-                <div class="text-xlg">不是该影仓观影券 <br> 请您到2号影仓</div>
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk1" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo.hall_name}}</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal2" ok-text="知道了" cancel-text="再来一单" @ok="doOk2" @cancel="doCancel">
-            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">30分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
-            </div>
-        </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal3" ok-text="知道了" cancel-text="去登陆" @ok="doOk3" @cancel="doCancel">
-            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
-                <div class="text-xlg">您还没有登录 <br> 请先登录</div>
-            </div>
-        </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal4" ok-text="再看看" cancel-text="去预定" @ok="doOk4" @cancel="doCancel">
-            <div class="notice-modal-container" style="height: 156px;background-image: url(../../../static/img/3@3x.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
-                <div class="text-xlg p-v-sm">您没有该影院的订单</div>
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk2" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
             </div>
         </i-modal>
         <i-toast id="toast" />
@@ -134,8 +124,8 @@ export default {
             modal: false,
             modal1: false,
             modal2: false,
-            modal3: false,
-            modal4: false,
+            userInfo: '',
+            orderInfo: {}
         }
     },
     methods: {
@@ -234,8 +224,6 @@ export default {
             this.modal = false
             this.modal1 = false
             this.modal2 = false
-            this.modal3 = false
-            this.modal4 = false
         },
         doOk1 () {
             this.modal1 = false
@@ -255,26 +243,31 @@ export default {
                 // 扫码开舱
                 wx.scanCode({
                     success(res) {
+                        console.log(res, 'url')
                         let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
                         that.$http.post(api.common.open, {
                             version: '1.0.0',
                             hall_id: hall_id
                         }, {
                             headers: {
-                                'AuthToken': 'ntPgSqdhiNyShvWPiFGhQzNFHzjXSuSr'
+                                'AuthToken': that.userInfo.auth_token
                             }
                         }).then((res) => {
                             if (res.data.code === 1) {
                                 // 允许控制
                                 wx.navigateTo({
-                                    url: '../bacode/main?'
+                                    url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
                                 })
                             } else if (res.data.code === 0) {
                                 that.modal = true
+                                that.orderInfo = res.data.data[0]
                             } else if (res.data.code === 2) {
                                 that.modal2 = true
+                                that.orderInfo = res.data.data[0]
+                                that.$set(that.orderInfo, 'count_down', parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60))
                             } else if (res.data.code === 3) {
                                 that.modal1 = true
+                                that.orderInfo = res.data.data[0]
                             } else {
                                 that.$Toast({
                                     content: res.data.msg,
@@ -345,6 +338,7 @@ export default {
                         openid: res.code
                     }).then((res) => {
                         if (res.data.code === 1) {
+                            that.userInfo = res.data.data
                             wx.setStorage({
                                 key: 'userInfo',
                                 data: res.data.data

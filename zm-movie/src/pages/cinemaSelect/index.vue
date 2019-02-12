@@ -14,7 +14,7 @@
                 <div class="poster-container"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{filmInfo.film_name}}
-                    <div class="pull-right p-sm" @click="doCollect">
+                    <div class="pull-right p-sm" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
                         <i-icon type="like_fill" v-if="filmInfo.fav_status==0" size="20" color="#d8d8d8" />
                         <i-icon type="like_fill" v-else size="20" color="#ff4747" />
                     </div>
@@ -27,7 +27,7 @@
                 <div class="text-sm text-gray text-line-20">时长: {{filmInfo.length || 0}}分钟 <span class="pull-right text-xs text-orange">{{filmInfo.viewer || 0}}次观看</span></div>
             </div>
             <ul class="cinema-list-container bg-white">
-                <li v-for="(item, index) in cinemaList" :key="item.id" @click="nextPage(item)" class="cinema-list-item border-bottom relative">
+                <li v-for="(item, index) in cinemaList" :key="item.id" @tap="nextPage(item)" class="cinema-list-item border-bottom relative">
                     <h5 class="text-bold">{{item.name}}</h5>
                     <div class="text-sm m-t-sm text-line-20">{{item.address || '暂无地址'}}</div>
                     <div class="text-gray text-sm m-t-xs">近期可观看场次：15:45 | 23:00</div>
@@ -51,6 +51,11 @@
                 cinemaList: [],
                 userInfo: {},
                 id: ''
+            }
+        },
+        computed: {
+            openType () {
+                return this.userInfo.user_mobile ? '' : 'getPhoneNumber'
             }
         },
         methods: {
@@ -88,6 +93,7 @@
                 })
             },
             doCollect () {
+                if (!this.userInfo.user_mobile) return
                 this.$http.post(api.mine.collect, {
                     version: '1.0.0',
                     film_id: this.filmInfo.id
@@ -101,6 +107,43 @@
                         this.$Toast({
                             content: res.data.msg,
                             type: 'success'
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            getPhoneNumber (e) {
+                this.$http.post(api.common.getTel, {
+                    iv: e.target.iv,
+                    encryptedData: e.target.encryptedData,
+                    session_key: this.userInfo.session_key
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.$http.post(api.common.bindTel, {
+                            mobile: res.data.data.phoneNumber,
+                            user_id: this.userInfo.user_id,
+                            platform: 'wx'
+                        }).then(res => {
+                            if (res.data.code === 1) {
+                                this.$Toast({
+                                    content: '手机号绑定成功',
+                                    type: 'success'
+                                })
+                                this.userInfo = res.data.data
+                                wx.setStorage({
+                                    key: 'userInfo',
+                                    data: res.data.data
+                                })
+                            } else {
+                                this.$Toast({
+                                    content: res.data.msg,
+                                    type: 'error'
+                                })
+                            }
                         })
                     } else {
                         this.$Toast({

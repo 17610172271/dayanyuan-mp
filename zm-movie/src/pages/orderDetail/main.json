@@ -2,5 +2,7 @@
   "navigationBarTitleText": "订单详情",
   "usingComponents": {
     "i-icon": "../../../static/iView/icon/index"
-  }
+  },
+  "disableScroll": true,
+  "enablePullDownRefresh ": true
 }

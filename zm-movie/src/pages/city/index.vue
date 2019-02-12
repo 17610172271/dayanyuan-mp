@@ -7,7 +7,7 @@
         <div class="current-city">
             <div class="current-city-head">选择城市</div>
             <ul>
-                <li class="current-city-body bg-white" :class="{'text-orange': item.city===city}" v-for="(item, index) in cities" :key="index" @click="selectCity(item)">
+                <li class="current-city-body bg-white" :class="{'text-orange': item.city===city}" v-for="(item, index) in cities" :key="index" @tap="selectCity(item)">
                     {{item.city}}
                     <i-icon type="success_fill" v-if="item.city===city" class="pull-right m-r-sm" size="22" color="#ffa726" />
                 </li>

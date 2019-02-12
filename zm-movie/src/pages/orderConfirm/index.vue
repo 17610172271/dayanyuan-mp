@@ -4,7 +4,7 @@
             <h5 class="text-xlg text-bold text-line-normal">{{orderInfo.film_name}}</h5>
             <div class="text-gray text-line-normal" style="margin-top: 28rpx;">{{orderInfo.film_en_name}}</div>
             <div class="text-lg text-line-normal" style="margin-top: 28rpx;">观影时间</div>
-            <div class="text-orange text-line-normal" style="margin-top: 28rpx;">{{format(orderInfo.trade_start_time, orderInfo.trade_end_time)}}</div>
+            <div class="text-orange text-line-normal" style="margin-top: 28rpx;">{{watch_time}}</div>
             <div class="text-lg text-line-normal" style="margin-top: 28rpx;">观影地点</div>
             <div class="text-bold text-orange text-line-normal" style="margin-top: 28rpx;">{{orderInfo.cinema_name}} {{orderInfo.hall_name}}</div>
             <div class="m-t-md border-top-dashed clear p-t-lg">
@@ -16,20 +16,16 @@
             <h5 class="text-dark text-bold text-line-normal">购票须知:</h5>
             <div class="text-gray text-sm m-t-sm text-line-normal">影舱影票一经售出不可退换，请提前10分钟到达指定影舱，不可更改放映影舱。如遇问题请与客服人员联系。</div>
             <div class="text-center" style="margin-top: 108rpx;">
-                <a :href="'/pages/orderDetail/main?id='+orderInfo.trade_id" class="select-time-btn text-center">确认支付</a>
+                <button class="select-time-btn text-center" @tap="goPay">确认支付</button>
                 <div class="text-center text-gray text-sm m-t-sm">
                     支付剩余时间
                     <i-count-down
-                        :target="orderInfo.effective_time"
-                        :clear-timer="clearTime"
+                        :target="effective_time"
+                        :clear-timer="false"
                     ></i-count-down>
                 </div>
             </div>
         </div>
-        <i-modal i-class="tel-modal" title="大眼猿 申请获得" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">
-            <div class="text-left text-dark m-t-sm text-xlg modal-padding">你的手机号码</div>
-            <div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>
-        </i-modal>
         <i-toast id="toast" />
     </div>
 </template>
@@ -40,11 +36,11 @@
     export default {
         data () {
             return {
-                modal: false,
-                telVal: '17610111283',
                 orderInfo: '',
                 clearTime: false,
-                userInfo: {}
+                userInfo: {},
+                watch_time: '',
+                effective_time: 9999999999999
             }
         },
         methods: {
@@ -60,12 +56,8 @@
                 }).then((res) => {
                     if (res.data.code === 1) {
                         this.orderInfo = res.data.data
-                        let effective_time = this.orderInfo.effective_time
-                        this.orderInfo.effective_time = new Date().getTime() + this.orderInfo.effective_time * 1000
-                        let that = this
-                        setTimeout(function () {
-                            that.clearTime = true
-                        }, effective_time)
+                        this.watch_time = format(this.orderInfo.trade_start_time, this.orderInfo.trade_end_time)
+                        this.effective_time = parseInt(new Date().getTime()) + this.orderInfo.effective_time * 1000
                     } else {
                         this.$Toast({
                             content: res.data.msg,
@@ -74,11 +66,50 @@
                     }
                 })
             },
-            doOk () {
-                this.modal = false
-            },
-            doCancel () {
-                this.modal = false
+            goPay () {
+                let that = this
+                this.$http.post(api.common.pay, {
+                    version: '1.0.0',
+                    trade_id: this.orderInfo.trade_id,
+                    openid: 'otFW15HNFGpGbq6bII1Tl-mCB91s'
+                }, {
+                    headers: {
+                        'AuthToken': this.userInfo.auth_token
+                    }
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        wx.requestPayment({
+                            timeStamp: res.data.data.timeStamp,
+                            nonceStr: res.data.data.nonceStr,
+                            package: res.data.data.package,
+                            signType: res.data.data.signType,
+                            paySign: res.data.data.paySign,
+                            success(res) {
+                                if (res.errMsg === 'requestPayment:ok') {
+                                    wx.navigateTo({
+                                        url: '/pages/orderDetail/main?id=' + that.orderInfo.trade_id
+                                    })
+                                } else {
+                                    that.$Toast({
+                                        content: res.errMsg,
+                                        type: 'error'
+                                    })
+                                }
+                            },
+                            fail(res) {
+                                that.$Toast({
+                                    content: res.errMsg,
+                                    type: 'error'
+                                })
+                            }
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
             },
             format: format
         },
@@ -89,13 +120,8 @@
                 success(res) {
                     that.userInfo = res.data
                     that.getOrderData(option.trade_id)
-                },
-                fail () {
-                    that.userInfo = {}
                 }
             })
-        },
-        watch: {
         }
     }
 </script>

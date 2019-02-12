@@ -4,8 +4,8 @@
             <div class="mine-home-avatar"><open-data type="userAvatarUrl"></open-data></div>
             <div class="info-content">
                 <div class="text-xxlg"><open-data type="userNickName"></open-data></div>
-                <div class="info-tel" v-if="false">187****3344</div>
-                <div v-else class="info-tel" style="color: #ef7008;" @click="modal=true">绑定手机号 <span class="info-tel-img"><img src="/static/img/invalid-name@3x.png" alt=""></span></div>
+                <div class="info-tel" v-if="userInfo.user_mobile">{{userInfo.user_mobile}}</div>
+                <button v-else open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" class="info-tel" style="color: #ef7008;">绑定手机号 <span class="info-tel-img"><img src="/static/img/invalid-name@3x.png" alt=""></span></button>
             </div>
         </div>
         <div>
@@ -15,33 +15,71 @@
                 <i-cell title="我的设备" i-class="border-bottom" is-link url="/pages/mineDevice/main"></i-cell>
             </i-cell-group>
         </div>
-        <i-modal-normal i-class="tel-modal" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">
-            <h5 class="text-md text-dark text-left p-o-md text-bold" style="margin-bottom: 30rpx;">大眼猿 申请获得</h5>
-            <div class="text-left text-dark m-t-sm text-xlg p-l-md text-bold">你的手机号码</div>
-            <div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>
-            <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">获取手机号</button>
-            <div class="p-o-md" style="margin-top: 30rpx;"><a href="/pages/mineTel/main?page=mineHome" class="text-orange text-lg text-left">使用其他手机号登录</a></div>
-        </i-modal-normal>
+        <!--<i-modal-normal i-class="tel-modal" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">-->
+            <!--<h5 class="text-md text-dark text-left p-o-md text-bold" style="margin-bottom: 30rpx;">大眼猿 申请获得</h5>-->
+            <!--<div class="text-left text-dark m-t-sm text-xlg p-l-md text-bold">你的手机号码</div>-->
+            <!--<div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>-->
+            <!--<button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">获取手机号</button>-->
+            <!--<div class="p-o-md" style="margin-top: 30rpx;"><a href="/pages/mineTel/main?page=mineHome" class="text-orange text-lg text-left">使用其他手机号登录</a></div>-->
+        <!--</i-modal-normal>-->
         <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">
             <i-tab-bar-item key="homepage" img="/static/img/ic-hot-nor@3x.png" current-img="/static/img/ic-hot-cat@3x.png" title="热映"></i-tab-bar-item>
             <i-tab-bar-item key="code" icon="scan" current-icon="scan" title="扫码"></i-tab-bar-item>
             <i-tab-bar-item key="mine" img="/static/img/ic-me-nor@3x.png" current-img="/static/img/ic-me@3x.png" title="我的"></i-tab-bar-item>
         </i-tab-bar>
+        <i-toast id="toast" />
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
             return {
-                modal: true,
+                modal: false,
                 telVal: '17610172271',
-                currentTab: 'mine'
+                currentTab: 'mine',
+                userInfo: ''
             }
         },
         methods: {
             getPhoneNumber (e) {
                 console.log(e)
+                this.$http.post(api.common.getTel, {
+                    iv: e.target.iv,
+                    encryptedData: e.target.encryptedData,
+                    session_key: this.userInfo.session_key
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.$http.post(api.common.bindTel, {
+                            mobile: res.data.data.phoneNumber,
+                            user_id: this.userInfo.user_id,
+                            platform: 'wx'
+                        }).then(res => {
+                            if (res.data.code === 1) {
+                                this.$Toast({
+                                    content: '手机号绑定成功',
+                                    type: 'success'
+                                })
+                                this.userInfo = res.data.data
+                                wx.setStorage({
+                                    key: 'userInfo',
+                                    data: res.data.data
+                                })
+                            } else {
+                                this.$Toast({
+                                    content: res.data.msg,
+                                    type: 'error'
+                                })
+                            }
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
             },
             doOk () {
                 this.modal = false
@@ -68,17 +106,24 @@
             }
         },
         onLoad () {
-            const accountInfo = wx.getAccountInfoSync()
-            console.log('appid:', accountInfo.miniProgram.appId) // 小程序 appId
             wx.checkSession({
                 success() {
-                    console.log('未过期')
                     // session_key 未过期，并且在本生命周期一直有效
                 },
                 fail() {
-                    console.log('已过期')
                     // session_key 已经失效，需要重新执行登录流程
+                    console.log('relogin')
                     wx.login() // 重新登录
+                }
+            })
+            let that = this
+            wx.getStorage({
+                key: 'userInfo',
+                success(res) {
+                    that.userInfo = res.data
+                },
+                fail () {
+                    that.userInfo = {}
                 }
             })
         }
@@ -105,6 +150,13 @@
         font-size: 30rpx;
         line-height: 48rpx;
         margin-top: 18rpx;
+        border: 0;
+        outline: none;
+        background-color: #f5f5f5;
+        padding: 0;
+    }
+    .info-tel::after {
+        border:none;
     }
     .info-tel-img {
         display: inline-block;

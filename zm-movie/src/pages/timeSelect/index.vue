@@ -5,7 +5,7 @@
             <h5 class="text-dark text-lg text-line-normal">{{filmInfo.film_name}}</h5>
             <div class="text-sm text-gray text-line-normal">{{cinemaInfo.name}}</div>
             <div class="price-container">
-                <div class="text-orange text-line-normal text-center" @click="submitOrder">¥{{cinemaInfo.price}}起</div>
+                <div class="text-orange text-line-normal text-center" @tap="submitOrder">¥{{cinemaInfo.price}}起</div>
             </div>
         </div>
         <div class="select-time-container bg-white p-v-lg p-o-md">
@@ -34,7 +34,7 @@
                 </picker-view>
             </div>
             <div class="text-center" style="margin-top: 112rpx;">
-                <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @click="nextPage">选定时间{{openType}}</button>
+                <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">选定时间</button>
             </div>
         </div>
         <i-toast id="toast" />
@@ -52,7 +52,7 @@
                 timeList: '',
                 current: 0,
                 currentTime: 0,
-                selectTime: '',
+                selectTime: 0,
                 hours: [],
                 minutes: [],
                 status: [''],
@@ -78,11 +78,11 @@
                 return  new Date(Date.parse(date) + 48 * 60 * 60 * 1000).getMonth() + 1 + '月' + new Date(Date.parse(date) + 48 * 60 * 60 * 1000).getDate() + '日'
             },
             openType () {
-                return this.filmInfo.user_mobile ? '' : 'getPhoneNumber'
+                return this.userInfo.user_mobile ? '' : 'getPhoneNumber'
             }
         },
         methods: {
-            getFilmData (id) {
+            getFilmData (id, cinema_id) {
                 if (!id) return
                 this.$http.post(api.film.detail, {
                     version: '1.0.0',
@@ -91,6 +91,7 @@
                 }).then((res) => {
                     if (res.data.code === 1) {
                         this.filmInfo = res.data.data
+                        this.getTimeList(cinema_id, id)
                     } else {
                         this.$Toast({
                             content: res.data.msg,
@@ -136,8 +137,10 @@
             },
             tabChange (detail) {
                 this.current = detail.target.key
+                this.selectTime =this.pickerVal[0] * 60 * 60 + this.pickerVal[1] * 60
                 this.currentTime = new Date().setHours(0, 0, 0, 0) / 1000 + this.selectTime + this.current * 24 * 60 *60
                 let endTime = this.currentTime + this.filmInfo.length * 60
+                console.log(this.currentTime, endTime, '开始结束时间')
                 this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList)
                 this.status = this.hall_id ? ['可预订'] : ['不可预定']
             },
@@ -146,15 +149,48 @@
                 this.selectTime = e.target.value[0] * 60 * 60 + e.target.value[1] * 60
                 this.currentTime = new Date().setHours(0, 0, 0, 0) / 1000 + this.selectTime + this.current * 24 * 60 *60
                 let endTime = this.currentTime + this.filmInfo.length * 60
-                console.log(this.currentTime, endTime, this.filmInfo.length)
                 this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList) // 判断起止时间是否与list冲突   不冲突返回影仓id
-                console.log(this.hall_id)
                 this.status = this.hall_id ? ['可预订'] : ['不可预定']
             },
             getPhoneNumber (e) {
-                console.log('获取手机号', e)
+                this.$http.post(api.common.getTel, {
+                    iv: e.target.iv,
+                    encryptedData: e.target.encryptedData,
+                    session_key: this.userInfo.session_key
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.$http.post(api.common.bindTel, {
+                            mobile: res.data.data.phoneNumber,
+                            user_id: this.userInfo.user_id,
+                            platform: 'wx'
+                        }).then(res => {
+                            if (res.data.code === 1) {
+                                this.$Toast({
+                                    content: '手机号绑定成功',
+                                    type: 'success'
+                                })
+                                this.userInfo = res.data.data
+                                wx.setStorage({
+                                    key: 'userInfo',
+                                    data: res.data.data
+                                })
+                            } else {
+                                this.$Toast({
+                                    content: res.data.msg,
+                                    type: 'error'
+                                })
+                            }
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
             },
             nextPage () {
+                if (!this.userInfo.user_mobile) return
                 if (this.hall_id) {
                     this.$http.post(api.order.create, {
                         goods_id: this.filmInfo.id,
@@ -198,15 +234,15 @@
         },
         onLoad (option) {
             let date = new Date()
+            this.current = 0
             this.pickerVal = [date.getHours() + 1, date.getMinutes(), 0]
             this.getCinemaData(option.cinema_id)
-            this.getTimeList(option.cinema_id, option.id)
             let that = this
             wx.getStorage({
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
-                    that.getFilmData(option.id)
+                    that.getFilmData(option.id, option.cinema_id)
                 },
                 fail () {
                     that.userInfo = {}

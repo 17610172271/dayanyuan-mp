@@ -5,7 +5,7 @@
                 <div class="poster-container"><image :src="item.pic" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{item.title}}
-                    <div class="p-sm pull-right" @click="doCollect(item)">
+                    <div class="p-sm pull-right" @tap="doCollect(item)">
                         <i-icon type="like_fill" v-if="!item.is_collect" size="20" color="#edeced" />
                         <i-icon type="like_fill" v-else size="20" color="#ff4747" />
                     </div>

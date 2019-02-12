@@ -28,7 +28,7 @@
         </div>
         <div class="p-sm text-gray text-sm bg-white">为了给您带来更好的服务，吐槽一下影仓的亮点和不足吧～</div>
         <div class="text-center film-detail-btn">
-            <buttom class="select-time-btn text-center" @click="doComment">提交评价</buttom>
+            <buttom class="select-time-btn text-center" @tap="doComment">提交评价</buttom>
         </div>
         <i-toast id="toast" />
     </div>

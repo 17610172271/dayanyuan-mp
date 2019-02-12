@@ -12,15 +12,15 @@
         <div class="m-t-xs p-o-sm" v-if="listShow">
             <div class="search-top-head text-line-normal text-gray text-md">热门搜索</div>
             <div>
-                <span class="hot-search-item bg-eee" v-for="(item, index) in hotKeys" :key="index" @click="selectItem(item.word)">{{item.word}}</span>
+                <span class="hot-search-item bg-eee" v-for="(item, index) in hotKeys" :key="index" @tap="selectItem(item.word)">{{item.word}}</span>
                 <span class="hot-search-item bg-eee" v-if="hotKeys.length===0">暂无热门搜索</span>
             </div>
             <div class="search-top-head text-line-normal text-gray text-md" style="margin-top: 30rpx;">历史搜索</div>
-            <div><span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index" @click="selectItem(item)">{{item}}</span></div>
+            <div><span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index" @tap="selectItem(item)">{{item}}</span></div>
         </div>
         <div class="search-result-container" v-else>
             <ul>
-                <li class="m-b-sm bg-white search-result-item relative" @click="nextPage(item.id)" v-for="(item,index) in data" :key="item.id">
+                <li class="m-b-sm bg-white search-result-item relative" @tap="nextPage(item.id)" v-for="(item,index) in data" :key="item.id">
                     <div class="poster-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                     <h5 class="text-lg text-line-normal over-omit">{{item.film_name}}</h5>
                     <div class="text-sm text-gray text-line-20 m-t-sm over-omit">导演: {{item.director}}</div>

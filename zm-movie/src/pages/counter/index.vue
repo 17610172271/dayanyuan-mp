@@ -2,8 +2,8 @@
     <div class="counter-warp">
         <p>Vuex counter：{{ count }}</p>
         <p>
-            <button @click="increment">+</button>
-            <button @click="decrement">-</button>
+            <button @tap="increment">+</button>
+            <button @tap="decrement">-</button>
         </p>
 
         <a href="/pages/index/main" class="home">去往首页</a>

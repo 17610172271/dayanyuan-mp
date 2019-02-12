@@ -11,7 +11,7 @@
         </div>
         <div class="cinema-select-container">
             <ul>
-                <li class="cinema-select-item relative" v-for="(item,index) in cinemaList" :key="item.id" @click="selectCinema(item)">
+                <li class="cinema-select-item relative" v-for="(item,index) in cinemaList" :key="item.id" @tap="selectCinema(item)">
                     <h5 class="text-lg text-line-normal text-bold">{{item.name}}</h5>
                     <div class="text-sm cinema-address">{{item.address}}</div>
                     <div class="text-sm text-gray">{{item.distance}}m</div>

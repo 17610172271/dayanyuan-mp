@@ -19,26 +19,56 @@
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import api from '@/api'
     export default {
         data () {
             return {
-                status: true
+                status: true,
+                userInfo: {},
+                id: ''
             }
         },
         methods: {
-
-        },
-        onLoad () {
-            let that = this
-            setTimeout(function () {
-                that.status = false
-            }, 1000)
-            setTimeout(function () {
-                wx.navigateTo({
-                    url: '../mineDevice/main?'
+            getData () {
+                if (!this.id) return
+                let that = this
+                this.$http.post(api.mine.deviceStatus, {
+                    version: '1.0.0',
+                    hall_id: this.id
+                }, {
+                    headers: {
+                        'AuthToken': this.userInfo.auth_token
+                    }
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.status = false
+                        setTimeout(function () {
+                            wx.navigateTo({
+                                url: '../mineDevice/main?'
+                            })
+                        }, 1000)
+                    } else {
+                        setTimeout(function () {
+                            that.getData()
+                        }, 1000)
+                    }
                 })
-            },3000)
+            },
+        },
+        onLoad (option) {
+            this.id = option.id
+            let that = this
+            wx.getStorage({
+                key: 'userInfo',
+                success(res) {
+                    that.userInfo = res.data
+                    that.getData()
+                },
+                fail () {
+                    that.userInfo = {}
+                }
+            })
         }
     }
 </script>

@@ -2,6 +2,7 @@
   "navigationBarTitleText": "确认订单",
   "usingComponents": {
     "i-icon": "../../../static/iView/icon/index",
-    "i-modal": "../../../static/iView/modal/index"
+    "i-modal": "../../../static/iView/modal/index",
+    "i-count-down": "../../../static/iView/count-down/index"
   }
 }
