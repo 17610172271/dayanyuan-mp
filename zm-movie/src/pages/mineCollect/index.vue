@@ -31,6 +31,9 @@
         },
         methods: {
             getList (type) {
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.mine.collectList, {
                     version: '1.0.0',
                     page: this.page,
@@ -40,6 +43,9 @@
                         'AuthToken': this.userInfo.auth_token
                     }
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         if (type) {
                             this.data = this.data.concat(res.data.data.films).map(val => {

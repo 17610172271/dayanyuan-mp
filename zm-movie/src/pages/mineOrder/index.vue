@@ -97,6 +97,9 @@
         methods: {
             getList (type) {
                 this.loading = true
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.mine.orderList, {
                     version: '1.0.0',
                     status: this.current === 'unused' ? '0' : null,
@@ -110,6 +113,7 @@
                     let that = this
                     setTimeout(function () {
                         that.loading = false
+                        wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
                         console.log(new Date().getTime())
@@ -210,6 +214,10 @@
                         }).then((res) => {
                             if (res.data.code === 1) {
                                 // 允许控制
+                                wx.setStorage({
+                                    key: 'hall_id',
+                                    data: hall_id
+                                })
                                 wx.navigateTo({
                                     url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data.trade_id
                                 })

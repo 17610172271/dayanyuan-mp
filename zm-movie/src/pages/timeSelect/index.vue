@@ -84,11 +84,17 @@
         methods: {
             getFilmData (id, cinema_id) {
                 if (!id) return
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.film.detail, {
                     version: '1.0.0',
                     film_id: id,
                     user_id: this.userInfo.user_id
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         this.filmInfo = res.data.data
                         this.getTimeList(cinema_id, id)

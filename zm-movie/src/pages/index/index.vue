@@ -79,14 +79,14 @@
                 <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk1" @cancel="doCancel">
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
-                <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo.hall_name}}</div>
+                <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo && orderInfo.hall_name}}</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk2" @cancel="doCancel">
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
             </div>
         </i-modal>
         <i-toast id="toast" />
@@ -130,6 +130,9 @@ export default {
     },
     methods: {
         getData () {
+            wx.showLoading({
+              title: '加载中',
+            })
             this.getBannerList()
             this.getClassList()
             this.getRecommondList()
@@ -140,6 +143,9 @@ export default {
                 version: '1.0.0',
                 client_type: 3
             }).then((res) => {
+                setTimeout(function () {
+                    wx.hideLoading()
+                }, 500)
                 if (res.data.code === 1) {
                     this.imgUrls = res.data.data
                 } else {
@@ -219,23 +225,13 @@ export default {
         },
         doOk () {
             this.modal = false
+            this.modal1 = false
+            this.modal2 = false
         },
         doCancel () {
             this.modal = false
             this.modal1 = false
             this.modal2 = false
-        },
-        doOk1 () {
-            this.modal1 = false
-        },
-        doOk2 () {
-            this.modal2 = false
-        },
-        doOk3 () {
-            this.modal3 = false
-        },
-        doOk4 () {
-            this.modal4 = false
         },
         tabChange (detail) {
             let that = this
@@ -255,9 +251,16 @@ export default {
                         }).then((res) => {
                             if (res.data.code === 1) {
                                 // 允许控制
-                                wx.navigateTo({
-                                    url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                wx.setStorage({
+                                    key: 'hall_id',
+                                    data: hall_id,
+                                    success () {
+                                        wx.navigateTo({
+                                            url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                        })
+                                    }
                                 })
+                                
                             } else if (res.data.code === 0) {
                                 that.modal = true
                                 that.orderInfo = res.data.data[0]
@@ -278,11 +281,11 @@ export default {
                     }
                 })
             } else if (detail.mp.detail.key == 'mine') {
-                wx.navigateTo({
+                wx.redirectTo({
                     url: '../mineHome/main'
                 })
             } else {
-                wx.navigateTo({
+                wx.redirectTo({
                     url: '../index/main'
                 })
             }

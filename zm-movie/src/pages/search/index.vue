@@ -50,12 +50,18 @@
         },
         methods: {
             getList (type) {
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.film.searchResult, {
                     version: '1.0.0',
                     title: this.searchText,
                     page: this.page,
                     page_size: this.page_size
                 }).then(res => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     this.listShow = false
                     if (res.data.code === 1) {
                         if (type) {
@@ -89,15 +95,17 @@
             },
             selectItem (keywords) {
                 this.searchText = keywords
-                this.getList()
+                this.doSearch()
             },
             doSearch () {
                 this.getList()
-                this.history.push(this.searchText)
-                wx.setStorage({
-                    key: 'history',
-                    data: this.history
-                })
+                if (this.history.indexOf(this.searchText) === -1) {
+                    this.history.push(this.searchText)
+                    wx.setStorage({
+                        key: 'history',
+                        data: this.history
+                    })
+                }
             },
             nextPage (id) {
                 wx.navigateTo({

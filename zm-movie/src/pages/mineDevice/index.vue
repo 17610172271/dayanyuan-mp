@@ -16,6 +16,7 @@
             </div>
             <div class="progress-text text-lg text-dark">门锁将在5秒内打开，请稍后</div>
         </div>
+        <div v-else-if="status===4" class="p-sm text-center text-orange">没有可以控制的设备</div>
         <div v-else>
             <i-cell-group>
                 <i-cell title="新风">
@@ -30,21 +31,25 @@
                 <i-cell title="地灯">
                     <i-switch :value="data.lamp_indoor_foot_switch_status==1" size="default" i-class="device-btn" @change="foot_switchChange" slot="footer"></i-switch>
                 </i-cell>
-                <i-cell>
+                <i-cell i-class="border-top-large">
                     <div class="clear">
-                        <span class="pull-left">空调</span>
+                        <span class="pull-left"><i class="fa fa-edit"></i>空调</span>
                         <i-switch :value="data.aircondition_switch_status==1" class="pull-right" size="default" i-class="device-btn" @change="airconditionChange" slot="footer"></i-switch>
                     </div>
-                    <div class="relative conditioner-container m-t-lg">
+                    <!-- <div class="relative conditioner-container m-t-lg">
                         <slider @change="tempChange" style="padding: 14rpx 0;" min="18" max="30" v-model="tempVal" show-value :activeColor="activeColor" block-size="18" :backgroundColor="backgroundColor" :block-color="blockColor" />
                         <div class="btn-cool-hot clear" @tap="isCool=!isCool">
                             <div class="pull-left" :class="{'btn-cool': isCool}">冷</div>
                             <div class="pull-right" :class="{'btn-hot': !isCool}">热</div>
                         </div>
-                    </div>
+                    </div> -->
                 </i-cell>
-                <i-cell i-class="border-bottom" title="音量">
-                    <slider @change="volChange" min="0" max="100" v-model="voice" show-value activeColor="#f57c00" block-size="18" backgroundColor="#bdbdbd" block-color="#ffa726" />
+                <i-cell i-class="border-top-large">
+                    <div class="relative conditioner-container">
+                        <slider @change="volChange" min="0" max="100" v-model="data.play_vloume" show-value activeColor="#f57c00" block-size="18" backgroundColor="#bdbdbd" block-color="#ffa726" />
+                        <span class="voice-title">音量</span>
+                    </div>
+                    
                 </i-cell>
             </i-cell-group>
         </div>
@@ -58,13 +63,13 @@
         data () {
             return {
                 data: {
-                    aircondition_switch_status: 1, // 空调
+                    aircondition_switch_status: 0, // 空调
                     skylight_status: 0, // 天窗
-                    air_switch_status: 1, // 新风
+                    air_switch_status: 0, // 新风
                     lamp_indoor_top_switch_status: 0, // 顶灯
                     lamp_indoor_foot_switch_status: 0, // 底灯
+                    play_vloume: 0
                 },
-                voice: 50,
                 id: '',
                 trade_id: '',
                 userInfo: {},
@@ -87,7 +92,14 @@
         methods: {
             getData () {
                 let that = this
-                if (!this.id) return
+                console.log(this.id)
+                if (!this.id) {
+                    this.status = 4
+                    return
+                }
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.mine.deviceStatus, {
                     version: '1.0.0',
                     hall_id: this.id
@@ -96,17 +108,24 @@
                         'AuthToken': this.userInfo.auth_token
                     }
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         this.data = res.data.data
-                        this.status = 2
-                        setTimeout(function () {
-                            that.status = 3
-                        }, 1000)
+                        if (this.status === 1) {
+                            this.status = 2
+                            setTimeout(function () {
+                                that.status = 3
+                            }, 1000)
+                        }
+                    } else if (res.data.msg === '请先获取控制授权') {
+                        this.status = 4
                     } else {
-                        setTimeout(function () {
-                            that.getData()
-                        }, 1000)
-                    }
+                            setTimeout(function () {
+                                that.getData()
+                            }, 1000)
+                        }
                 })
             },
             airconditionChange (e) {
@@ -135,8 +154,8 @@
                 this.deviceContol(status)
             },
             volChange (e) {
-                this.voice = e.target.value
-                this.deviceContol('volume_set_value', this.voice)
+                this.data.play_vloume = e.target.value
+                this.deviceContol('volume_set_value', this.data.play_vloume)
             },
             deviceContol (status, value) {
                 this.$http.post(api.mine.control, {
@@ -165,6 +184,7 @@
             }
         },
         onLoad (option) {
+            this.status = 1
             if (option.id) {
                 this.status = 1
                 this.id = option.id
@@ -176,9 +196,21 @@
             let that = this
             wx.getStorage({
                 key: 'userInfo',
-                success(res) {
+                success (res) {
                     that.userInfo = res.data
-                    that.getData()
+                    wx.getStorage({
+                        key: 'hall_id',
+                        success(res) {
+                            console.log(res.data, 'hall_id')
+                            that.id = res.data || that.id
+
+                            that.getData()
+                        },
+                        fail (error) {
+                            console.log('err')
+                            that.getData()
+                        }
+                    })
                 },
                 fail () {
                     that.userInfo = {}
@@ -225,16 +257,10 @@
     .conditioner-container {
         padding-left: 240rpx;
     }
-    .btn-cool-hot {
+    .voice-title {
         position: absolute;
         left: 0;
         top: 0;
-        width: 114px;
-        height: 36px;
-        background-color: #fff;
-        background-color: #e4e4e4;
-        border-radius: 36px;
-        overflow: hidden;
     }
     .btn-cool-hot > div {
         width: 50%;
@@ -248,5 +274,8 @@
     }
     .btn-cool {
         background-color: #6d9af9;
+    }
+    .border-top-large {
+        border-top: 9px solid #f5f6f6;
     }
 </style>

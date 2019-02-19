@@ -37,12 +37,18 @@
         },
         methods: {
             getCinemaList () {
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.common.cinemaList, {
                     keywords: this.searchText,
                     city: this.city,
                     limit: this.limit,
                     page: this.page
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         this.cinemaList = res.data.data.cinemas
                     } else {

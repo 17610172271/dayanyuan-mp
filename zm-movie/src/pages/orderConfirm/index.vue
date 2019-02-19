@@ -46,6 +46,9 @@
         methods: {
             getOrderData (id) {
                 if (!id) return
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.order.detail, {
                     version: '1.0.0',
                     order_id: id
@@ -54,6 +57,9 @@
                         'AuthToken': this.userInfo.auth_token
                     }
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         this.orderInfo = res.data.data
                         this.watch_time = format(this.orderInfo.trade_start_time, this.orderInfo.trade_end_time)

@@ -6,6 +6,7 @@
     "i-cell-group": "../../../static/iView/cell-group/index",
     "i-cell": "../../../static/iView/cell/index",
     "i-modal-normal": "../../../static/iView/modal-normal/index",
+    "i-modal": "../../../static/iView/modal/index",
     "i-tab-bar": "../../../static/iView/tab-bar/index",
     "i-tab-bar-item": "../../../static/iView/tab-bar-item/index"
   }

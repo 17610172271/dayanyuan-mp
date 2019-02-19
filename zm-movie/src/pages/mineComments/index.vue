@@ -53,12 +53,18 @@
         },
         methods: {
             getFilmInfo (id) {
+                wx.showLoading({
+                    title: '加载中',
+                })
                 if (!id) return
                 this.$http.post(api.film.detail, {
                     version: '1.0.0',
                     film_id: id,
                     user_id: this.userInfo.user_id
                 }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
                     if (res.data.code === 1) {
                         this.filmInfo = res.data.data
                     } else {

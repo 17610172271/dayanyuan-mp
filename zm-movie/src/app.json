@@ -32,7 +32,5 @@
     "scope.userLocation": {
       "desc": "你的位置信息将用于搜索附近的影院信息"
     }
-  },
-  "enablePullDownRefresh": false,
-  "disableScroll": true
+  }
 }

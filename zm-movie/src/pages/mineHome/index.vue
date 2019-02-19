@@ -15,13 +15,21 @@
                 <i-cell title="我的设备" i-class="border-bottom" is-link url="/pages/mineDevice/main"></i-cell>
             </i-cell-group>
         </div>
-        <!--<i-modal-normal i-class="tel-modal" :visible="modal" ok-text="允许" cancel-text="拒绝" @ok="doOk" @cancel="doCancel">-->
-            <!--<h5 class="text-md text-dark text-left p-o-md text-bold" style="margin-bottom: 30rpx;">大眼猿 申请获得</h5>-->
-            <!--<div class="text-left text-dark m-t-sm text-xlg p-l-md text-bold">你的手机号码</div>-->
-            <!--<div class="m-t-sm p-o-md"><input class="tel-ipt p-xs text-lg" type="text" v-model="telVal"></div>-->
-            <!--<button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">获取手机号</button>-->
-            <!--<div class="p-o-md" style="margin-top: 30rpx;"><a href="/pages/mineTel/main?page=mineHome" class="text-orange text-lg text-left">使用其他手机号登录</a></div>-->
-        <!--</i-modal-normal>-->
+        <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
+                <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo && orderInfo.hall_name}}</div>
+            </div>
+        </i-modal>
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
+            <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+            </div>
+        </i-modal>
         <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">
             <i-tab-bar-item key="homepage" img="/static/img/ic-hot-nor@3x.png" current-img="/static/img/ic-hot-cat@3x.png" title="热映"></i-tab-bar-item>
             <i-tab-bar-item key="code" icon="scan" current-icon="scan" title="扫码"></i-tab-bar-item>
@@ -39,7 +47,11 @@
                 modal: false,
                 telVal: '17610172271',
                 currentTab: 'mine',
-                userInfo: ''
+                userInfo: '',
+                modal: false,
+                modal1: false,
+                modal2: false,
+                orderInfo: {}
             }
         },
         methods: {
@@ -83,23 +95,64 @@
             },
             doOk () {
                 this.modal = false
+                this.modal1 = false
+                this.modal2 = false
             },
             doCancel () {
                 this.modal = false
+                this.modal1 = false
+                this.modal2 = false
             },
             tabChange (detail) {
+            let that = this
                 if (detail.mp.detail.key == 'code') {
+                    // 扫码开舱
                     wx.scanCode({
                         success(res) {
-                            console.log(res)
+                            console.log(res, 'url')
+                            let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
+                            that.$http.post(api.common.open, {
+                                version: '1.0.0',
+                                hall_id: hall_id
+                            }, {
+                                headers: {
+                                    'AuthToken': that.userInfo.auth_token
+                                }
+                            }).then((res) => {
+                                if (res.data.code === 1) {
+                                    // 允许控制
+                                    wx.setStorage({
+                                        key: 'hall_id',
+                                        data: hall_id
+                                    })
+                                    wx.navigateTo({
+                                        url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                    })
+                                } else if (res.data.code === 0) {
+                                    that.modal = true
+                                    that.orderInfo = res.data.data[0]
+                                } else if (res.data.code === 2) {
+                                    that.modal2 = true
+                                    that.orderInfo = res.data.data[0]
+                                    that.$set(that.orderInfo, 'count_down', parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60))
+                                } else if (res.data.code === 3) {
+                                    that.modal1 = true
+                                    that.orderInfo = res.data.data[0]
+                                } else {
+                                    that.$Toast({
+                                        content: res.data.msg,
+                                        type: 'error'
+                                    })
+                                }
+                            })
                         }
                     })
                 } else if (detail.mp.detail.key == 'mine') {
-                    wx.navigateTo({
+                    wx.redirectTo({
                         url: '../mineHome/main'
                     })
                 } else {
-                    wx.navigateTo({
+                    wx.redirectTo({
                         url: '../index/main'
                     })
                 }

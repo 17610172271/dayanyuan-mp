@@ -12,6 +12,7 @@ fly.interceptors.request.use((config,promise)=>{
 })
 //配置请求基地址
 fly.config.baseURL='http://58.132.170.53:15555'
+// fly.config.baseURL='http://test.dyy.appapi.xgcinema.com'
 //fly.config.baseURL='http://192.168.58.172:81'
 Vue.prototype.$http = fly //将fly实例挂在vue原型上
 Vue.prototype.$Toast = $Toast
