@@ -162,8 +162,8 @@ export default {
             }).then((res) => {
                 if (res.data.code === 1) {
                     this.classList = res.data.data
-                    this.selectedClass = this.classList[0].category
-                    this.selectedClassList = this.classList[0].films
+                    this.selectedClass = this.classList[0] ? this.classList[0].category : ''
+                    this.selectedClassList = this.classList[0] ? this.classList[0].films : ''
                 } else {
                     this.$Toast({
                         content: res.data.msg,

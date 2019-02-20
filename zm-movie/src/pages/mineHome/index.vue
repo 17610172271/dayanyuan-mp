@@ -104,7 +104,7 @@
                 this.modal2 = false
             },
             tabChange (detail) {
-            let that = this
+                let that = this
                 if (detail.mp.detail.key == 'code') {
                     // 扫码开舱
                     wx.scanCode({
