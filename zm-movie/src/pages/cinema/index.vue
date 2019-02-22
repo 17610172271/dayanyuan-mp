@@ -5,7 +5,7 @@
                 <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
                 <!--<i-input :value="searchText" i-class="search-input" maxLength="100" placeholder="搜索影片" />-->
                 <form action="">
-                    <input type="text" class="search-input" v-model="searchText" placeholder="搜索附近的影院" @confirm="getCinemaList">
+                    <input type="text" class="search-input" v-model="searchText" placeholder="搜索附近的影院" @confirm="searchCinemaList">
                 </form>
             </div>
         </div>
@@ -15,8 +15,9 @@
                     <h5 class="text-lg text-line-normal text-bold">{{item.name}}</h5>
                     <div class="text-sm cinema-address">{{item.address}}</div>
                     <div class="text-sm text-gray">{{item.distance}}m</div>
-                    <div class="location-icon"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
+                    <div class="location-icon icon-item"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
                 </li>
+                <li class="text-orange text-center p-v-sm" v-if="cinemaList.length===0">暂时没有更多数据</li>
             </ul>
         </div>
         <i-toast id="toast" />
@@ -40,9 +41,33 @@
                 wx.showLoading({
                     title: '加载中',
                 })
+                this.$http.post(api.common.cinemaNearby, {
+                    city_id: this.location.city_id,
+                    longitude: this.location.location[0],
+                    latitude: this.location.location[1]
+                }).then((res) => {
+                    setTimeout(function () {
+                        wx.hideLoading()
+                    }, 500)
+                    if (res.data.code === 1) {
+                        this.cinemaList = res.data.data.cinemas
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            searchCinemaList () {
+                wx.showLoading({
+                    title: '加载中',
+                })
                 this.$http.post(api.common.cinemaList, {
                     keywords: this.searchText,
                     city: this.city,
+                    longitude: this.location.location[0],
+                    latitude: this.location.location[1],
                     limit: this.limit,
                     page: this.page
                 }).then((res) => {
@@ -75,6 +100,7 @@
                 key: 'location',
                 success(res) {
                     that.city = res.data.city.replace('市', '')
+                    that.location = res.data
                     that.getCinemaList()
                 },
                 fail () {
@@ -113,8 +139,12 @@
         background-image: linear-gradient(302deg, #f57c00, #ffa726);
     }
     .location-icon .icon-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
-        top: 16rpx;
-        left: 16rpx;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
     }
 </style>

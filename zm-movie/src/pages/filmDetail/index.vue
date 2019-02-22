@@ -179,7 +179,7 @@
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
-                    that.getfilmData(option.id)
+                    // that.getfilmData(option.id)
                 },
                 fail () {
                     that.userInfo = {}

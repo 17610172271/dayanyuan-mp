@@ -156,7 +156,7 @@
                 this.$http.post(api.common.pay, {
                     version: '1.0.0',
                     trade_id: trade_id,
-                    openid: 'otFW15HNFGpGbq6bII1Tl-mCB91s'
+                    openid: that.userInfo.open_id
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token
@@ -171,10 +171,7 @@
                             paySign: res.data.data.paySign,
                             success(res) {
                                 if (res.errMsg === 'requestPayment:ok') {
-                                    that.$Toast({
-                                        content: '支付成功',
-                                        type: 'success'
-                                    })
+                                    that.getList()
                                     that.current = 'all'
                                 } else {
                                     that.$Toast({
@@ -185,7 +182,7 @@
                             },
                             fail(res) {
                                 that.$Toast({
-                                    content: res.errMsg,
+                                    content: '支付失败',
                                     type: 'error'
                                 })
                             }

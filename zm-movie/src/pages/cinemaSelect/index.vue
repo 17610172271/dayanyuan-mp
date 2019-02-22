@@ -30,7 +30,7 @@
                 <li v-for="(item, index) in cinemaList" :key="item.id" @tap="nextPage(item)" class="cinema-list-item border-bottom relative">
                     <h5 class="text-bold">{{item.name}}</h5>
                     <div class="text-sm m-t-sm text-line-20">{{item.address || '暂无地址'}}</div>
-                    <div class="text-gray text-sm m-t-xs">近期可观看场次：15:45 | 23:00</div>
+                    <!-- <div class="text-gray text-sm m-t-xs">近期可观看场次：15:45 | 23:00</div> -->
                     <div class="price-container">
                         <div class="text-orange text-bold text-line-normal text-center">¥{{item.price}}起</div>
                         <div class="text-sm text-gray text-center">{{item.distance}}km</div>
@@ -179,7 +179,7 @@
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
-                    that.getfilmData(option.id)
+                    // that.getfilmData(option.id)
                 },
                 fail () {
                     that.userInfo = {}

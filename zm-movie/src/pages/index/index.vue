@@ -21,6 +21,7 @@
             :autoplay="autoplay"
             :interval="interval"
             :duration="duration"
+            :circular="circular"
             indicator-active-color="#ef6c00">
             <block v-for="(item, index) in imgUrls" :key="item.id">
                 <swiper-item class="swiper-container">
@@ -57,7 +58,7 @@
                     </div>
                 </div>
             </div>
-            <div class="m-t-sm p-o-sm p-b-lg">
+            <div class="m-t-sm p-o-sm p-b-sm" :class="{'p-b-lg': !loading}">
                 <i-row>
                     <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @tap="selectCinema(item.id)">
                         <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
@@ -70,7 +71,7 @@
                     </i-col>
                 </i-row>
             </div>
-            <div class="p-sm" v-show="loading">
+            <div class="p-sm" style="padding-bottom: 60rpx;" v-show="loading">
                 <i-load-more i-class="devide-container" tip="上拉加载更多" :loading="loading" />
             </div>
         </div>
@@ -121,6 +122,7 @@ export default {
             autoplay: true,
             interval: 3000,
             duration: 1000,
+            circular: true,
             modal: false,
             modal1: false,
             modal2: false,
@@ -193,8 +195,12 @@ export default {
                 page: this.page,
                 page_size: this.page_size
             }).then((res) => {
-                this.loading = false
+                let that = this
+                setTimeout(function () {
+                    that.loading = false
+                }, 1000)
                 if (res.data.code === 1) {
+                    if (this.page === 1) this.moreList = []
                     this.moreList = this.moreList.concat(res.data.data.films)
                     if (res.data.data.films.length === 0) this.divideShow = true
                 } else {
@@ -239,8 +245,15 @@ export default {
                 // 扫码开舱
                 wx.scanCode({
                     success(res) {
-                        console.log(res, 'url')
+                        console.log(res, '二维码url')
                         let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
+                        if (!hall_id) {
+                            that.$Toast({
+                                content: '请扫描正确的二维码',
+                                type: 'error'
+                            })
+                            return
+                        }
                         that.$http.post(api.common.open, {
                             version: '1.0.0',
                             hall_id: hall_id
@@ -273,7 +286,7 @@ export default {
                                 that.orderInfo = res.data.data[0]
                             } else {
                                 that.$Toast({
-                                    content: res.data.msg,
+                                    content: '未知异常',
                                     type: 'error'
                                 })
                             }
@@ -376,7 +389,7 @@ export default {
                                     let location = [res.longitude, res.latitude]
                                     let city = ''
                                     let id = ''
-                                    that.$http.get('https://restapi.amap.com/v3/geocode/regeo?output=json&location=' + res.longitude + ',' + res.latitude + '&key=f9bc06292ee628b75291ba3922f65ed4&extensions=all').then((res) => {
+                                    that.$http.get('https://restapi.amap.com/v3/geocode/regeo?output=json&location=' + res.longitude + ',' + res.latitude + '&key=602d412b5c8841798676c8fc4a8aa094&extensions=all').then((res) => {
                                         that.city = city = res.data.regeocode.addressComponent.city.length === 0 ? res.data.regeocode.addressComponent.province : res.data.regeocode.addressComponent.city
                                         wx.setStorage({
                                             key: 'location',
@@ -394,7 +407,7 @@ export default {
                                             if (res.data.code === 1) {
                                                 res.data.data.cities.map(val => {
                                                     if (val.city === city) {
-                                                        id = val.id
+                                                        id = val.id ||val.city_code
                                                         wx.setStorage({
                                                             key: 'location',
                                                             data: {

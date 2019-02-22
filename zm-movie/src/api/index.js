@@ -5,6 +5,7 @@
 export const common = {
     cityList: '/api/v1/cinema/cities', // 城市列表
     cinemaList: '/api/v1/cinema/search', // 搜索-影院列表
+    cinemaNearby: '/api/v1/cinema/nearby', // 附近的影院
     cinemaDetail: '/api/v1/cinema/detail', // 影院详情
     timeList: '/api/v1/cinema/hall_times', // 影院占用时间表
     pay: '/api/v1/pay/wechat_mini', // 微信支付
@@ -22,6 +23,7 @@ export  const film = {
     recommend: '/api/v1/movies/recommend', // 每日推荐
     detail: '/api/v1/movies/detail', // 影片详情
     cinemaList: '/api/v1/movies/cinema', // 影片下影院列表
+    cinemaDetail: '/api/v1/cinema/hallTimesList', // 选择时间=>影院及影片信息
     searchResult: '/api/v1/movies/search/results', // 搜索结果
     hotKeys: '/api/v1/movies/search/keywords/hot', // 热门关键词
 }

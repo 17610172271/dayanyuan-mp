@@ -1,11 +1,11 @@
 <template>
     <div class="border-top bg-f5">
-        <div class="film-name-container bg-white m-b-sm relative">
+        <div class="film-name-container bg-white m-b-sm relative" style="min-height: 148rpx;">
             <div class="select-time-img"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
             <h5 class="text-dark text-lg text-line-normal">{{filmInfo.film_name}}</h5>
             <div class="text-sm text-gray text-line-normal">{{cinemaInfo.name}}</div>
             <div class="price-container">
-                <div class="text-orange text-line-normal text-center" @tap="submitOrder">¥{{cinemaInfo.price}}起</div>
+                <div class="text-orange text-line-normal text-center" @tap="submitOrder">¥{{filmInfo.price || 0}}起</div>
             </div>
         </div>
         <div class="select-time-container bg-white p-v-lg p-o-md">
@@ -47,6 +47,11 @@
     export default {
         data () {
             return {
+                data: {
+                    cinema: '',
+                    film: '',
+                    time: ''
+                },
                 filmInfo: '',
                 cinemaInfo: '',
                 timeList: '',
@@ -82,57 +87,28 @@
             }
         },
         methods: {
-            getFilmData (id, cinema_id) {
-                if (!id) return
+            // 获取数据
+            getFilmData (film_id, cinema_id) {
+                if (!film_id || !cinema_id) return
                 wx.showLoading({
                     title: '加载中',
                 })
-                this.$http.post(api.film.detail, {
-                    version: '1.0.0',
-                    film_id: id,
-                    user_id: this.userInfo.user_id
+                this.$http.post(api.film.cinemaDetail, {
+                    cinema_id: cinema_id,
+                    film_id: film_id
                 }).then((res) => {
                     setTimeout(function () {
                         wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
-                        this.filmInfo = res.data.data
-                        this.getTimeList(cinema_id, id)
-                    } else {
-                        this.$Toast({
-                            content: res.data.msg,
-                            type: 'error'
-                        })
-                    }
-                })
-            },
-            getCinemaData (id) {
-                if (!id) return
-                this.$http.post(api.common.cinemaDetail, {
-                    version: '1.0.0',
-                    cinema_id: id
-                }).then((res) => {
-                    if (res.data.code === 1) {
-                        this.cinemaInfo = res.data.data
-                    } else {
-                        this.$Toast({
-                            content: res.data.msg,
-                            type: 'error'
-                        })
-                    }
-                })
-            },
-            getTimeList (cinema_id, film_id) {
-                this.$http.post(api.common.timeList, {
-                    cinema_id: cinema_id,
-                    film_id: film_id
-                }).then((res) => {
-                    if (res.data.code === 1) {
-                        this.timeList = res.data.data
+                        this.filmInfo = res.data.data.film
+                        this.cinemaInfo = res.data.data.cinema
+                        this.timeList = res.data.data.time
                         this.currentTime = parseInt(new Date().getTime() / 1000) + 3600
                         let endTime = this.currentTime + this.filmInfo.length * 60
                         this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList)
                         this.status = this.hall_id ? ['可预订'] : ['不可预定']
+
                     } else {
                         this.$Toast({
                             content: res.data.msg,
@@ -141,6 +117,38 @@
                     }
                 })
             },
+            // getCinemaData (id) {
+            //     if (!id) return
+            //     this.$http.post(api.common.cinemaDetail, {
+            //         version: '1.0.0',
+            //         cinema_id: id
+            //     }).then((res) => {
+            //         if (res.data.code === 1) {
+            //             this.cinemaInfo = res.data.data
+            //         } else {
+            //             this.$Toast({
+            //                 content: res.data.msg,
+            //                 type: 'error'
+            //             })
+            //         }
+            //     })
+            // },
+            // getTimeList (cinema_id, film_id) {
+            //     this.$http.post(api.common.timeList, {
+            //         cinema_id: cinema_id,
+            //         film_id: film_id
+            //     }).then((res) => {
+            //         if (res.data.code === 1) {
+            //             this.timeList = res.data.data
+            //             
+            //         } else {
+            //             this.$Toast({
+            //                 content: res.data.msg,
+            //                 type: 'error'
+            //             })
+            //         }
+            //     })
+            // },
             tabChange (detail) {
                 this.current = detail.target.key
                 this.selectTime =this.pickerVal[0] * 60 * 60 + this.pickerVal[1] * 60
@@ -242,7 +250,6 @@
             let date = new Date()
             this.current = 0
             this.pickerVal = [date.getHours() + 1, date.getMinutes(), 0]
-            this.getCinemaData(option.cinema_id)
             let that = this
             wx.getStorage({
                 key: 'userInfo',

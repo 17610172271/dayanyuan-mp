@@ -77,7 +77,7 @@
                 this.$http.post(api.common.pay, {
                     version: '1.0.0',
                     trade_id: this.orderInfo.trade_id,
-                    openid: 'otFW15HNFGpGbq6bII1Tl-mCB91s'
+                    openid: this.userInfo.open_id
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token
@@ -104,7 +104,7 @@
                             },
                             fail(res) {
                                 that.$Toast({
-                                    content: res.errMsg,
+                                    content: '支付失败',
                                     type: 'error'
                                 })
                             }
