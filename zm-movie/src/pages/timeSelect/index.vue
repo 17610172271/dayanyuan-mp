@@ -37,6 +37,11 @@
                 <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">选定时间</button>
             </div>
         </div>
+        <i-modal-normal i-class="notice-modal" :visible="modal" ok-text="前往支付" cancel-text="取消订单" @ok="goPay" @cancel="cancelOrder">
+            <div class="notice-modal-container">
+                <div class="p-v-sm">您当前还有未支付的订单待处理</div>
+            </div>
+        </i-modal-normal>
         <i-toast id="toast" />
     </div>
 </template>
@@ -66,7 +71,9 @@
                 hall_id: '',
                 list: [],
                 pickerVal: [0, 0, 0],
-                userInfo: {}
+                userInfo: {},
+                modal: false,
+                trade_id: ''
             }
         },
         computed: {
@@ -117,38 +124,6 @@
                     }
                 })
             },
-            // getCinemaData (id) {
-            //     if (!id) return
-            //     this.$http.post(api.common.cinemaDetail, {
-            //         version: '1.0.0',
-            //         cinema_id: id
-            //     }).then((res) => {
-            //         if (res.data.code === 1) {
-            //             this.cinemaInfo = res.data.data
-            //         } else {
-            //             this.$Toast({
-            //                 content: res.data.msg,
-            //                 type: 'error'
-            //             })
-            //         }
-            //     })
-            // },
-            // getTimeList (cinema_id, film_id) {
-            //     this.$http.post(api.common.timeList, {
-            //         cinema_id: cinema_id,
-            //         film_id: film_id
-            //     }).then((res) => {
-            //         if (res.data.code === 1) {
-            //             this.timeList = res.data.data
-            //             
-            //         } else {
-            //             this.$Toast({
-            //                 content: res.data.msg,
-            //                 type: 'error'
-            //             })
-            //         }
-            //     })
-            // },
             tabChange (detail) {
                 this.current = detail.target.key
                 this.selectTime =this.pickerVal[0] * 60 * 60 + this.pickerVal[1] * 60
@@ -219,8 +194,9 @@
                             wx.navigateTo({
                                 url: '/pages/orderConfirm/main?trade_id=' + res.data.data.trade_id
                             })
-                        } else if (res.data.msg === '用户手机号不存在') {
+                        } else if (res.data.msg === '请先支付或关闭上个订单') {
                             this.modal = true
+                            this.trade_id = res.data.data.trade_id
                         } else {
                             this.$Toast({
                                 content: res.data.msg,
@@ -235,6 +211,33 @@
                         type: 'error'
                     })
                 }
+            },
+            cancelOrder () {
+                this.$http.post(api.order.cancel, {
+                    trade_id: this.trade_id
+                }, {
+                    headers: {
+                        'AuthToken': this.userInfo.auth_token
+                    }
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.modal = false
+                        this.$Toast({
+                            content: '订单取消成功',
+                            type: 'success'
+                        })
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            goPay () {
+                wx.navigateTo({
+                    url: '/pages/orderConfirm/main?trade_id=' + this.trade_id
+                })
             },
             isOccupy: occupy
         },

@@ -27,7 +27,7 @@
         </i-modal>
         <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
             </div>
         </i-modal>
         <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">

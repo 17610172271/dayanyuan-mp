@@ -64,7 +64,7 @@
         </i-modal>
         <i-modal i-class="notice-modal" :visible="modal2" ok-text="知道了" cancel-text="再来一单" @ok="doOk2" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
             </div>
         </i-modal>
 
@@ -102,7 +102,7 @@
                 })
                 this.$http.post(api.mine.orderList, {
                     version: '1.0.0',
-                    status: this.current === 'unused' ? '0' : null,
+                    status: this.current === 'unused' ? '1' : '',
                     page: this.page,
                     page_size: this.page_size
                 }, {

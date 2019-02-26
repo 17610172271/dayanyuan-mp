@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "影片详情",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

@@ -40,7 +40,8 @@
                 clearTime: false,
                 userInfo: {},
                 watch_time: '',
-                effective_time: 9999999999999
+                effective_time: 9999999999999,
+                modal: false
             }
         },
         methods: {

@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/main",
+    "pages/filmDetail/main",
+    "pages/filmIntro/main",
     "pages/mineTel/main",
     "pages/mineHome/main",
     "pages/bacode/main",
@@ -12,7 +14,6 @@
     "pages/city/main",
     "pages/search/main",
     "pages/cinemaSelect/main",
-    "pages/filmDetail/main",
     "pages/orderDetail/main",
     "pages/orderConfirm/main",
     "pages/timeSelect/main",

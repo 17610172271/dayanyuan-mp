@@ -87,7 +87,7 @@
         </i-modal>
         <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前10分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
             </div>
         </i-modal>
         <i-toast id="toast" />
@@ -116,7 +116,6 @@ export default {
             page: 1,
             page_size: 30,
             loading: true,
-            divideShow: false,
             currentTab: 'homepage',
             indicatorDots: true,
             autoplay: true,
@@ -202,7 +201,10 @@ export default {
                 if (res.data.code === 1) {
                     if (this.page === 1) this.moreList = []
                     this.moreList = this.moreList.concat(res.data.data.films)
-                    if (res.data.data.films.length === 0) this.divideShow = true
+                    if (res.data.data.films.length > 0) {
+                        console.log(12345)
+                        this.page += 1
+                    }
                 } else {
                     this.$Toast({
                         content: res.data.msg,
@@ -221,7 +223,7 @@ export default {
         },
         selectCinema (id) {
             wx.navigateTo({
-                url: '../filmDetail/main?id=' + id
+                url: '../filmIntro/main?id=' + id
             })
         },
         goSearch () {
@@ -332,54 +334,13 @@ export default {
                     that.city = '北京'
                 }
             })
-        }
-    },
-    onReachBottom () {
-        this.page += 1
-        this.getMoreList()
-    },
-    onShow () {
-
-    },
-    created () {
-        let that = this
-        wx.login({
-            success: function(res) {
-                if (res.code) {
-                    console.log(res.code)
-                    that.$http.post(api.common.login, {
-                        version: '1.0.0',
-                        device_no: res.code,
-                        platform: 'wx',
-                        openid: res.code
-                    }).then((res) => {
-                        if (res.data.code === 1) {
-                            that.userInfo = res.data.data
-                            wx.setStorage({
-                                key: 'userInfo',
-                                data: res.data.data
-                            })
-                        } else {
-                            that.$Toast({
-                                content: res.data.msg,
-                                type: 'error'
-                            })
-                        }
-                    })
-                }
-            }
-        })
-    },
-    onLoad () {
-        this.getData()
-        this.getCinemaInfo()
-        this.getCity()
-        let that = this
-//        获取用户信息及地理位置授权并存储城市位置信息
-        wx.getSetting({
-            success(res) {
-//                获取位置信息
-                if (!res.authSetting['scope.userLocation']) {
+        },
+        getLocation () {
+            let that = this
+            // 获取用户信息及地理位置授权并存储城市位置信息
+            wx.getSetting({
+                success(res) {
+                // 获取位置信息
                     wx.authorize({
                         scope: 'scope.userLocation',
                         success() {
@@ -428,11 +389,52 @@ export default {
                         }
                     })
                 }
+            })
+        }
+    },
+    onReachBottom () {
+        this.getMoreList()
+    },
+    created () {
+        let that = this
+        wx.login({
+            success: function(res) {
+                if (res.code) {
+                    console.log(res.code)
+                    that.$http.post(api.common.login, {
+                        version: '1.0.0',
+                        device_no: res.code,
+                        platform: 'wx',
+                        openid: res.code
+                    }).then((res) => {
+                        if (res.data.code === 1) {
+                            that.userInfo = res.data.data
+                            wx.setStorage({
+                                key: 'userInfo',
+                                data: res.data.data
+                            })
+                        } else {
+                            that.$Toast({
+                                content: res.data.msg,
+                                type: 'error'
+                            })
+                        }
+                    })
+                }
             }
         })
     },
+    onShow () {
+        this.getData()
+        this.getCinemaInfo()
+        this.getCity()
+        this.getLocation()
+    },
     onLaunch () {
-
+        this.getData()
+        this.getCinemaInfo()
+        this.getCity()
+        this.getLocation()
     }
 }
 </script>

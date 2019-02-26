@@ -100,6 +100,7 @@
                 key: 'location',
                 success(res) {
                     that.city = res.data.city.replace('市', '')
+                    console.log(res.data)
                     that.location = res.data
                     that.getCinemaList()
                 },
