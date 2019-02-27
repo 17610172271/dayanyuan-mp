@@ -87,7 +87,7 @@
                         })
                     } else {
                         this.$Toast({
-                            content: res.data.msg,
+                            content: '手机号获取失败',
                             type: 'error'
                         })
                     }

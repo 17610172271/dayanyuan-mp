@@ -14,10 +14,10 @@
                 <div class="poster-container"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{filmInfo.film_name}}
-                    <div class="pull-right p-sm" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
+                    <button class="pull-right p-sm collect-btn" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
                         <i-icon type="like_fill" v-if="filmInfo.fav_status==0" size="20" color="#d8d8d8" />
                         <i-icon type="like_fill" v-else size="20" color="#ff4747" />
-                    </div>
+                    </button>
                 </h5>
                 <div class="text-gray text-sm">{{filmInfo.film_en_name}}</div>
                 <div class="text-sm text-gray text-line-20 m-t-xs over-omit">导演: {{filmInfo.director}}</div>
@@ -123,6 +123,7 @@
                 })
             },
             getPhoneNumber (e) {
+                console.log(e)
                 this.$http.post(api.common.getTel, {
                     iv: e.target.iv,
                     encryptedData: e.target.encryptedData,
@@ -153,7 +154,7 @@
                         })
                     } else {
                         this.$Toast({
-                            content: res.data.msg,
+                            content: '手机号获取失败',
                             type: 'error'
                         })
                     }

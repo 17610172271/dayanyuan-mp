@@ -54,7 +54,7 @@
                     <div class="first-image"><image :src="recommend.image_url" class="slide-image" mode="widthFix"></image></div>
                     <div>
                         <div class="title-text m-t-sm p-l-sm">{{recommend.title}}</div>
-                        <div class="subtitle-text p-l-sm" style="margin-top: 4rpx;">{{recommend.subtitleZ}}次观看</div>
+                        <div class="subtitle-text p-l-sm" style="margin-top: 4rpx;">{{recommend.subtitleZ || 0}}次观看</div>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                             <div class="recommend-image-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                             <div>
                                 <div class="title-text m-t-sm over-omit">{{item.film_name}}</div>
-                                <div class="subtitle-text" style="margin-top: 4rpx;">{{item.viewer}}次观看</div>
+                                <div class="subtitle-text" style="margin-top: 4rpx;">{{item.viewer || 0}}次观看</div>
                             </div>
                         </div>
                     </i-col>
