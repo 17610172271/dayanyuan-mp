@@ -109,7 +109,7 @@
             },
             nextPage (id) {
                 wx.navigateTo({
-                    url: '../filmDetail/main?id=' + id
+                    url: '../filmIntro/main?id=' + id
                 })
             }
         },
