@@ -242,6 +242,7 @@
             isOccupy: occupy
         },
         created () {
+            this.modal = false
             for (let i = 0; i < 24; i++) {
                 this.hours.push(i < 10 ? '0' + i : i + '')
             }
