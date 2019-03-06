@@ -2,7 +2,7 @@
     <div class="search-result-container border-top">
         <ul>
             <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in data" :key="item.id">
-                <div class="poster-container"><image :src="item.pic" class="slide-image" mode="scaleToFill"></image></div>
+                <div class="poster-container bg-eee"><image :src="item.pic" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{item.title}}
                     <div class="p-sm pull-right" @tap="doCollect(item)">
@@ -14,6 +14,7 @@
                 <div class="text-sm text-gray text-line-20 over-omit">主演: {{item.actor}}</div>
                 <div class="text-sm text-gray text-line-20 over-omit">类型: {{item.class}}</div>
             </li>
+            <li class="p-v-sm text-center text-orange" v-show="data.length==0">没有更多数据</li>
         </ul>
         <i-toast id="toast" />
     </div>
@@ -26,7 +27,7 @@
             return {
                 data: [],
                 page: 1,
-                page_size: 10
+                page_size: 30
             }
         },
         methods: {
@@ -129,6 +130,8 @@
         width: 140rpx;
         height: 200rpx;
         position: absolute;
+        border-radius: 8rpx;
+        overflow: hidden;
         top: 20rpx;
         left: 20rpx;
     }

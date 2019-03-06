@@ -2,7 +2,7 @@
     <div class="border-top">
         <div class="search-result-container">
             <div class="m-b-sm bg-white search-result-item relative">
-                <div class="poster-container"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
+                <div class="poster-container bg-eee"><image :src="filmInfo.image_url" v-if="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{filmInfo.film_name}}
                     <button class="pull-right p-sm collect-btn" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
@@ -149,7 +149,7 @@
                     },
                     fail () {
                         wx.navigateTo({
-                            url: '../cinemaSelect/main?id=' + that.filmInfo.id
+                            url: '../cinemaSelect/main?id=' + that.filmInfo.id + '&fav=' + that.filmInfo.fav_status
                         })
                     }
                 })
@@ -179,7 +179,7 @@
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
-                    // that.getfilmData(option.id)
+                    that.getfilmData(option.id)
                 },
                 fail () {
                     that.userInfo = {}

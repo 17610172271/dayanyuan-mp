@@ -36,13 +36,13 @@
                         <span class="pull-left"><i class="fa fa-edit"></i>空调</span>
                         <i-switch :value="data.aircondition_switch_status==1" class="pull-right" size="default" i-class="device-btn" @change="airconditionChange" slot="footer"></i-switch>
                     </div>
-                    <!-- <div class="relative conditioner-container m-t-lg">
-                        <slider @change="tempChange" style="padding: 14rpx 0;" min="18" max="30" v-model="tempVal" show-value :activeColor="activeColor" block-size="18" :backgroundColor="backgroundColor" :block-color="blockColor" />
-                        <div class="btn-cool-hot clear" @tap="isCool=!isCool">
+                    <div class="relative conditioner-container" v-show="data.aircondition_switch_status==1">
+                        <slider @change="tempChange" style="padding: 14rpx 0;" min="18" max="30" v-model="data.aircondition_temperature" show-value :activeColor="activeColor" block-size="18" :backgroundColor="backgroundColor" :block-color="blockColor" />
+                        <!-- <div class="btn-cool-hot clear" @tap="isCool=!isCool">
                             <div class="pull-left" :class="{'btn-cool': isCool}">冷</div>
                             <div class="pull-right" :class="{'btn-hot': !isCool}">热</div>
-                        </div>
-                    </div> -->
+                        </div> -->
+                    </div>
                 </i-cell>
                 <i-cell i-class="border-top-large">
                     <div class="relative conditioner-container">
@@ -133,6 +133,11 @@
                 let status = e.target.value ? 'aircondition_on' : 'aircondition_off'
                 this.deviceContol(status)
             },
+            tempChange (e) {
+                this.data.aircondition_temperature = e.target.value
+                let status = 'aircondition_set_value'
+                this.deviceContol(status, this.data.aircondition_temperature)
+            },
             skylightChange (e) {
                 this.data.skylight_status = e.target.value
                 let status = e.target.value ? 'skylight_on' : 'skylight_off'
@@ -202,8 +207,8 @@
                         key: 'hall_id',
                         success(res) {
                             console.log(res.data, 'hall_id')
-                            that.id = res.data || that.id
-
+                            that.id = res.data.hall_id || that.id
+                            that.trade_id = res.data.trade_id || that.trade_id
                             that.getData()
                         },
                         fail (error) {

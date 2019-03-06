@@ -1,7 +1,7 @@
 <template>
     <div class="search-result-container border-top">
         <div class="m-b-sm bg-white search-result-item relative">
-            <div class="poster-container"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
+            <div class="poster-container bg-eee"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
             <h5 class="text-lg text-line-normal">{{filmInfo.film_name}} <span class="text-sm text-gray">2018年5月17日 12:24:54</span></h5>
             <div class="text-sm text-dark text-line-20 m-t-xs">{{cinema_name}}</div>
             <div class="text-sm text-gray text-line-20 m-t-xs">{{cinema_address}}</div>
@@ -26,7 +26,9 @@
                 </li>
             </ul>
         </div>
-        <div class="p-sm text-gray text-sm bg-white">为了给您带来更好的服务，吐槽一下影仓的亮点和不足吧～</div>
+        <div class="p-sm text-gray text-sm bg-white">
+            <textarea style="width: 100%;font-size: 24rpx;height: 300rpx;" :value="content" @input="textAreaChange" placeholder="为了给您带来更好的服务，吐槽一下影仓的亮点和不足吧～" />
+        </div>
         <div class="text-center film-detail-btn">
             <buttom class="select-time-btn text-center" @tap="doComment">提交评价</buttom>
         </div>
@@ -48,7 +50,8 @@
                 cinema_address: '',
                 trade_start_time: '',
                 trade_id: '',
-                userInfo: {}
+                userInfo: {},
+                content: ''
             }
         },
         methods: {
@@ -75,6 +78,9 @@
                     }
                 })
             },
+            textAreaChange (e) {
+                this.content = e.mp.detail.value
+            },
             envChange (e) {
                 this.valOne = e.target.index
             },
@@ -90,11 +96,12 @@
             doComment () {
                 this.$http.post(api.order.comment, {
                     version: '1.0.0',
-                    trade_id: this.trade_id,
+                    order_id: this.trade_id,
                     evn: this.valOne,
                     seat: this.valTwo,
                     light: this.valThree,
-                    sound: this.valFour
+                    sound: this.valFour,
+                    content: this.content
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token
@@ -116,6 +123,13 @@
                     }
                 })
             }
+        },
+        onShow () {
+            this.valOne = 5
+            this.valTwo = 5
+            this.valThree = 5
+            this.valFour = 5
+            this.content = ''
         },
         onLoad (option) {
             let that = this

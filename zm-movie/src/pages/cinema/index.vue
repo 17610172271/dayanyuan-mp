@@ -32,7 +32,7 @@
                 city: '北京',
                 cinemaList: [],
                 page: 1,
-                limit: 10,
+                limit: 30,
                 searchText: ''
             }
         },

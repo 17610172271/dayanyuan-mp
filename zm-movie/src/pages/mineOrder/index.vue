@@ -12,7 +12,7 @@
             </div>
             <div class="order-item-container bg-white" v-for="(item,index) in data" :key="item.trade_id" v-show="!loading||data.length>0">
                 <div class="order-item-top relative">
-                    <div>{{item.cinema_name}}</div>
+                    <div>{{item.hall_name}}</div>
                     <div class="text-gray m-t-sm text-line-20 p-r-lg">{{item.cinema_address}}</div>
                     <div class="location-icon icon-item"><i-icon type="coordinates_fill" class="icon-item" size="16" color="#fff" /></div>
                 </div>
@@ -81,7 +81,7 @@
                 current: 'all',
                 data: [],
                 page: 1,
-                page_size: 10,
+                page_size: 30,
                 modal0: false,
                 id: '',
                 loading: false,
@@ -143,6 +143,7 @@
                 })
             },
             tabChange (detail) {
+                this.page = 1
                 this.current = detail.target.key
             },
             doComments (item) {
@@ -213,10 +214,15 @@
                                 // 允许控制
                                 wx.setStorage({
                                     key: 'hall_id',
-                                    data: hall_id
-                                })
-                                wx.navigateTo({
-                                    url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data.trade_id
+                                    data: {
+                                        hall_id: hall_id,
+                                        trade_id: res.data.data[0].trade_id
+                                    },
+                                    success () {
+                                        wx.navigateTo({
+                                            url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                        })
+                                    }
                                 })
                             } else if (res.data.code === 0) {
                                 that.modal = true
@@ -299,6 +305,7 @@
             this.getList('more')
         },
         onLoad () {
+            this.page = 1
             let that = this
             wx.getStorage({
                 key: 'userInfo',

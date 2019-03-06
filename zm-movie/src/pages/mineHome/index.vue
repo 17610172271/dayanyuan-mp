@@ -1,7 +1,7 @@
 <template>
     <div class="mine-home">
         <div class="info-container relative">
-            <div class="mine-home-avatar"><open-data type="userAvatarUrl"></open-data></div>
+            <div class="mine-home-avatar bg-white"><open-data type="userAvatarUrl"></open-data></div>
             <div class="info-content">
                 <div class="text-xxlg"><open-data type="userNickName"></open-data></div>
                 <div class="info-tel" v-if="userInfo.user_mobile">{{userInfo.user_mobile}}</div>
@@ -123,10 +123,15 @@
                                     // 允许控制
                                     wx.setStorage({
                                         key: 'hall_id',
-                                        data: hall_id
-                                    })
-                                    wx.navigateTo({
-                                        url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                        data: {
+                                            hall_id: hall_id,
+                                            trade_id: res.data.data[0].trade_id
+                                        },
+                                        success () {
+                                            wx.navigateTo({
+                                                url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id
+                                            })
+                                        }
                                     })
                                 } else if (res.data.code === 0) {
                                     that.modal = true

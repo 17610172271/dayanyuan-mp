@@ -16,7 +16,7 @@
         </div>
         <!--轮播-->
         <swiper
-            class="swiper-container m-t-sm"
+            class="swiper-container m-t-sm bg-eee"
             :indicator-dots="indicatorDots"
             :autoplay="autoplay"
             :interval="interval"
@@ -32,14 +32,16 @@
         <!--分类-->
         <div class="scroll-x-container">
             <scroll-view scroll-x class="hotplay-title-container">
-                <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @tap="selectClass(item.category)">{{item.category}}</span>
+                <div style="height: 50rpx;" :class="{'bg-eee': classList.length==0}">
+                    <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @tap="selectClass(item.category)">{{item.category}}</span>
+                </div>
             </scroll-view>
         </div>
 
         <div>
             <scroll-view scroll-x class="hotplay-container">
                 <div class="image-container" v-for="(item, index) in selectedClassList" :key="item.id" @tap="selectCinema(item.id)">
-                    <div class="image-item-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
+                    <div class="image-item-container bg-eee"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                     <div class="title-text title-p over-omit">{{item.title}}</div>
                     <div class="subtitle-text p-l-sm">{{item.viewer || 0}}次观看</div>
                 </div>
@@ -51,7 +53,7 @@
             <h3 class="day-recommend">每日推荐·你想看的都在这里</h3>
             <div>
                 <div class="first-image-container" @tap="selectCinema(recommend.id)">
-                    <div class="first-image"><image :src="recommend.image_url" class="slide-image" mode="widthFix"></image></div>
+                    <div class="first-image bg-eee"><image :src="recommend.image_url" class="slide-image" mode="widthFix"></image></div>
                     <div>
                         <div class="title-text m-t-sm p-l-sm">{{recommend.title}}</div>
                         <div class="subtitle-text p-l-sm" style="margin-top: 4rpx;">{{recommend.subtitleZ || 0}}次观看</div>
@@ -62,7 +64,7 @@
                 <i-row>
                     <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @tap="selectCinema(item.id)">
                         <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
-                            <div class="recommend-image-container"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
+                            <div class="recommend-image-container bg-eee"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
                             <div>
                                 <div class="title-text m-t-sm over-omit">{{item.film_name}}</div>
                                 <div class="subtitle-text" style="margin-top: 4rpx;">{{item.viewer || 0}}次观看</div>
@@ -268,7 +270,10 @@ export default {
                                 // 允许控制
                                 wx.setStorage({
                                     key: 'hall_id',
-                                    data: hall_id,
+                                    data: {
+                                        hall_id: hall_id,
+                                        trade_id: res.data.data[0].trade_id
+                                    },
                                     success () {
                                         wx.navigateTo({
                                             url: '../mineDevice/main?id=' + hall_id + '&trade_id=' + res.data.data[0].trade_id

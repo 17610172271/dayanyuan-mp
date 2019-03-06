@@ -1,7 +1,7 @@
 <template>
     <div class="border-top bg-f5">
         <div class="film-name-container bg-white m-b-sm relative" style="min-height: 148rpx;">
-            <div class="select-time-img"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
+            <div class="select-time-img bg-eee"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
             <h5 class="text-dark text-lg text-line-normal">{{filmInfo.film_name}}</h5>
             <div class="text-sm text-gray text-line-normal">{{cinemaInfo.name}}</div>
             <div class="price-container">
