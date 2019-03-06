@@ -60,7 +60,7 @@
                     </div>
                 </div>
             </div>
-            <div class="m-t-sm p-o-sm p-b-sm" :class="{'p-b-lg': !loading}">
+            <div class="m-t-sm p-o-sm p-b-sm" :class="{'p-b-xlg': !loading}">
                 <i-row>
                     <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @tap="selectCinema(item.id)">
                         <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
@@ -545,5 +545,8 @@ export default {
     .city-index-container {
         max-width: 80rpx;
         display: inline-block;
+    }
+    .p-b-xlg {
+        padding-bottom: 100rpx;
     }
 </style>
