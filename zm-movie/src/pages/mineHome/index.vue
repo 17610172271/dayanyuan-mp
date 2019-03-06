@@ -12,7 +12,8 @@
             <i-cell-group>
                 <i-cell title="我的收藏" is-link url="/pages/mineCollect/main"></i-cell>
                 <i-cell title="我的订单" is-link url="/pages/mineOrder/main"></i-cell>
-                <i-cell title="我的设备" i-class="border-bottom" is-link url="/pages/mineDevice/main"></i-cell>
+                <i-cell title="我的设备" is-link url="/pages/mineDevice/main"></i-cell>
+                <i-cell title="帮助中心" i-class="border-bottom" is-link url="/pages/mineHelp/main"></i-cell>
             </i-cell-group>
         </div>
         <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">

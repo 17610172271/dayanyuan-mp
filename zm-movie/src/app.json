@@ -8,6 +8,7 @@
     "pages/bacode/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
+    "pages/mineHelp/main",
     "pages/mineCollect/main",
     "pages/cinema/main",
     "pages/counter/main",
