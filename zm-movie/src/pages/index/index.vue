@@ -444,7 +444,7 @@ export default {
         this.getData()
         this.getCinemaInfo()
         this.getCity()
-        this.getLocation()
+        // this.getLocation()
     },
     onLaunch () {
         this.getData()
