@@ -1,7 +1,7 @@
 <template>
     <div class="search-result-container border-top">
         <ul>
-            <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in data" :key="item.id">
+            <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in data" :key="item.id" v-if="item.is_collect">
                 <div class="poster-container bg-eee"><image :src="item.pic" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{item.title}}
@@ -48,6 +48,10 @@
                         wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
+                        if (this.page === 1) this.data = []
+                        if (res.data.data.films.length > 0) {
+                            this.page += 1
+                        }
                         if (type) {
                             this.data = this.data.concat(res.data.data.films).map(val => {
                                 return {
@@ -96,7 +100,6 @@
             }
         },
         onReachBottom () {
-            this.page += 1
             this.getList('more')
         },
         onLoad (option) {
@@ -105,6 +108,7 @@
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
+                    that.page = 1
                     that.getList(option.id)
                 },
                 fail () {

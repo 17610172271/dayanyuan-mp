@@ -139,6 +139,7 @@
                 this.currentTime = new Date().setHours(0, 0, 0, 0) / 1000 + this.selectTime + this.current * 24 * 60 *60
                 let endTime = this.currentTime + this.filmInfo.length * 60
                 this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList) // 判断起止时间是否与list冲突   不冲突返回影仓id
+                console.log(this.currentTime, endTime, this.timeList, 'hall_id')
                 this.status = this.hall_id ? ['可预订'] : ['不可预定']
             },
             getPhoneNumber (e) {

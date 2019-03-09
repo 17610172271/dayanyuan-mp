@@ -1,12 +1,15 @@
 <template>
     <div>
-        <div class="home-top-container relative">
-            <div class="search-box">
+        <div class="home-top-container relative border-top">
+            <div class="search-box relative">
                 <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
                 <!--<i-input :value="searchText" i-class="search-input" maxLength="100" placeholder="搜索影片" />-->
                 <form action="">
-                    <input type="text" class="search-input" v-model="searchText" placeholder="搜索影片" @confirm="doSearch">
+                    <input type="text" class="search-input" focus v-model="searchText" placeholder="搜索影片" @confirm="doSearch">
                 </form>
+                <span class="clear-icon" v-show="searchText.length>0" @click="clearSearch">
+                    <i-icon type="close" size="14" color="#80848f" />
+                </span>
             </div>
         </div>
         <div class="m-t-xs p-o-sm" v-if="listShow">
@@ -77,6 +80,10 @@
                         })
                     }
                 })
+            },
+            clearSearch () {
+                this.searchText = ''
+                this.listShow = true
             },
             getHotKeys () {
                 this.$http.post(api.film.hotKeys, {
@@ -155,6 +162,10 @@
         height: 68rpx;
         line-height: 68rpx;
         padding-left: 10rpx;
+        color: #666;
+    }
+    .search-box .search-box-icon {
+        margin-top: -4rpx;
     }
     .hot-search-item {
         display: inline-block;
@@ -177,5 +188,12 @@
         position: absolute;
         top: 20rpx;
         left: 20rpx;
+    }
+    .clear-icon {
+        position: absolute;
+        top: -1px;
+        right: 0;
+        padding: 0 10px;
+        z-index: 99;
     }
 </style>

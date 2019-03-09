@@ -57,14 +57,14 @@
                 <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk1" @cancel="doCancel">
+        <i-modal i-class="notice-modal" :visible="modal1" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
                 <div class="text-xlg">不是该影仓观影券 <br> 请您到{{orderInfo.hall_name}}</div>
             </div>
         </i-modal>
-        <i-modal i-class="notice-modal" :visible="modal2" ok-text="知道了" cancel-text="再来一单" @ok="doOk2" @cancel="doCancel">
+        <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo.count_down}}</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
             </div>
         </i-modal>
 
@@ -116,7 +116,10 @@
                         wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
-                        console.log(new Date().getTime())
+                        if (this.page === 1) this.data = []
+                        if (res.data.data.orders.length > 0) {
+                            this.page += 1
+                        }
                         if (type) {
                             this.data = this.data.concat(res.data.data.orders).map(val => {
                                 return {
@@ -230,7 +233,7 @@
                             } else if (res.data.code === 2) {
                                 that.modal2 = true
                                 that.orderInfo = res.data.data[0]
-                                that.$set(that.orderInfo, 'count_down', parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60))
+                                that.$set(that.orderInfo, 'count_down', that.returnDate(parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60)))
                             } else if (res.data.code === 3) {
                                 that.modal1 = true
                                 that.orderInfo = res.data.data[0]
@@ -272,18 +275,28 @@
                     }
                 })
             },
+            returnDate (time) {
+                time *= 1
+                console.log(parseInt(time / 1440) + '天' + parseInt((time % 1440) / 60) + '小时' + time % 60 + '分钟', 'time')
+                if (time > 1440) {
+                    return parseInt(time / 1440) + '天' + parseInt((time % 1440) / 60) + '小时' + time % 60 + '分钟'
+                } else if (time > 60) {
+                    return parseInt(time / 60) + '小时' + time % 60 + '分钟'
+                } else {
+                    return time + '分钟'
+                }
+            },
             doOk () {
                 this.modal = false
+                this.modal1 = false
+                this.modal2 = false
+                wx.navigateTo({
+                    url: '../index/main'
+                })
             },
             doCancel () {
                 this.modal = false
                 this.modal1 = false
-                this.modal2 = false
-            },
-            doOk1 () {
-                this.modal1 = false
-            },
-            doOk2 () {
                 this.modal2 = false
             },
             touchStart (e) {
@@ -301,7 +314,6 @@
             }
         },
         onReachBottom () {
-            this.page += 1
             this.getList('more')
         },
         onLoad () {

@@ -1,7 +1,7 @@
 <template>
     <div class="border-top">
         <ul style="margin-bottom: 50px;">
-            <li v-for="item in list">
+            <li v-for="(item,index) in list" :key="index">
                 <div class="p-sm text-lg m-t-sm" style="line-height: 44rpx;">{{item.question}}</div>
                 <div class="p-sm text-md" style="background-color: #f1f1f1;line-height: 40rpx;">{{item.answer}}</div>
             </li>

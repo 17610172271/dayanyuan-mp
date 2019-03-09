@@ -89,7 +89,7 @@
         </i-modal>
         <i-modal i-class="notice-modal" :visible="modal2" ok-text="再来一单" cancel-text="知道了" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:20px;">
-                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}分钟</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
+                <div class="text-md">离观影时间还有: <br> <span class="text-xlg text-orange">{{orderInfo && orderInfo.count_down}}</span> <br> <span class="">(请在观影前15分钟内打开舱门)</span></div>
             </div>
         </i-modal>
         <i-toast id="toast" />
@@ -128,7 +128,9 @@ export default {
             modal1: false,
             modal2: false,
             userInfo: '',
-            orderInfo: {}
+            orderInfo: {
+                count_down: 0
+            }
         }
     },
     methods: {
@@ -204,7 +206,6 @@ export default {
                     if (this.page === 1) this.moreList = []
                     this.moreList = this.moreList.concat(res.data.data.films)
                     if (res.data.data.films.length > 0) {
-                        console.log(12345)
                         this.page += 1
                     }
                 } else {
@@ -287,7 +288,7 @@ export default {
                             } else if (res.data.code === 2) {
                                 that.modal2 = true
                                 that.orderInfo = res.data.data[0]
-                                that.$set(that.orderInfo, 'count_down', parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60))
+                                that.$set(that.orderInfo, 'count_down', that.returnDate(parseInt((that.orderInfo.trade_start_time * 1000 - new Date().getTime()) / 1000 / 60)))
                             } else if (res.data.code === 3) {
                                 that.modal1 = true
                                 that.orderInfo = res.data.data[0]
@@ -339,6 +340,16 @@ export default {
                     that.city = '北京'
                 }
             })
+        },
+        returnDate (time) {
+            time *= 1
+            if (time > 1440) {
+                return parseInt(time / 1440) + '天' + parseInt((time % 1440) / 60) + '小时' + time % 60 + '分钟'
+            } else if (time > 60) {
+                return parseInt(time / 60) + '小时' + time % 60 + '分钟'
+            } else {
+                return time + '分钟'
+            }
         },
         getLocation () {
             let that = this
@@ -405,7 +416,6 @@ export default {
         wx.login({
             success: function(res) {
                 if (res.code) {
-                    console.log(res.code)
                     that.$http.post(api.common.login, {
                         version: '1.0.0',
                         device_no: res.code,
@@ -430,6 +440,7 @@ export default {
         })
     },
     onShow () {
+        this.page = 1
         this.getData()
         this.getCinemaInfo()
         this.getCity()
