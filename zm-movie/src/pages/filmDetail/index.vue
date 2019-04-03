@@ -6,8 +6,8 @@
                 <h5 class="text-lg text-line-normal">
                     {{filmInfo.film_name}}
                     <button class="pull-right p-sm collect-btn" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
-                        <i-icon type="like_fill" v-if="filmInfo.fav_status==0" size="20" color="#d8d8d8" />
-                        <i-icon type="like_fill" v-else size="20" color="#ff4747" />
+                        <i-icon type="collection_fill" v-if="filmInfo.fav_status==0" size="20" color="#d8d8d8" />
+                        <i-icon type="collection_fill" v-else size="20" color="#ff4747" />
                     </button>
                 </h5>
                 <div class="text-gray text-sm">{{filmInfo.film_en_name}}</div>

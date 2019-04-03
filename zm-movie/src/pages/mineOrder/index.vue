@@ -97,9 +97,9 @@
         methods: {
             getList (type) {
                 this.loading = true
-                wx.showLoading({
-                    title: '加载中',
-                })
+                // wx.showLoading({
+                //     title: '加载中',
+                // })
                 this.$http.post(api.mine.orderList, {
                     version: '1.0.0',
                     status: this.current === 'unused' ? '1' : '',
@@ -113,7 +113,7 @@
                     let that = this
                     setTimeout(function () {
                         that.loading = false
-                        wx.hideLoading()
+                        // wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
                         if (this.page === 1) this.data = []
@@ -266,6 +266,7 @@
                             content: '订单取消成功',
                             type: 'success'
                         })
+                        this.page = 1
                         this.getList()
                     } else {
                         this.$Toast({

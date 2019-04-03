@@ -60,7 +60,7 @@
                     }
                 })
                 wx.navigateTo({
-                    url: '../index/main'
+                    url: '../cinema/main'
                 })
             },
             getLocation () {

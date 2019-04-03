@@ -1,14 +1,36 @@
 <template>
     <div class="border-top bg-f5">
-        <div class="film-name-container bg-white m-b-sm relative" style="min-height: 148rpx;">
-            <div class="select-time-img bg-eee"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
-            <h5 class="text-dark text-lg text-line-normal">{{filmInfo.film_name}}</h5>
-            <div class="text-sm text-gray text-line-normal">{{cinemaInfo.name}}</div>
-            <div class="price-container">
-                <div class="text-orange text-line-normal text-center" @tap="submitOrder">¥{{filmInfo.price || 0}}起</div>
+        <div class="bg-white search-result-item relative">
+            <div class="poster-container"><image v-if="filmInfo.cover" :src="filmInfo.cover" class="slide-image" mode="scaleToFill"></image></div>
+            <h5 class="text-lg text-line-normal over-omit" style="height: 48rpx;">
+                {{filmInfo.film_name}}
+                <button class="pull-right collect-btn" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
+                    <i-icon type="collection_fill" v-if="filmInfo.fav_status==0" size="20" color="#d8d8d8" />
+                    <i-icon type="collection_fill" v-else size="20" color="#ff4747" />
+                </button>
+            </h5>
+            <div class="text-gray text-sm over-omit">{{filmInfo.en_name}}</div>
+            <div class="relative" @tap="nextDetailPage">
+                <div class="text-sm text-gray text-line-18 m-t-sm over-omit">导演: {{filmInfo.director}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit">主演: {{filmInfo.actor}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.clazz}}</div>
+                <div class="text-sm text-gray text-line-18">上映: {{filmInfo.release_date}}</div>
+                <div class="text-sm text-gray text-line-18">时长: {{filmInfo.length || 0}}分钟</div>
+                <div class="enter-film-detail"><i-icon type="enter" class="icon-center" size="16" color="#ffa726" /></div>
+            </div>
+            <div class="text-md text-orange text-line-20 text-bold">
+                <span class="text-xs">¥</span>{{filmInfo.min_price}} - <span class="text-xs">¥</span>{{filmInfo.min_price}}
+                <span class="pull-right text-xs" style="color: #de872d;">{{filmInfo.viewer || 0}}次观看</span>
             </div>
         </div>
-        <div class="select-time-container bg-white p-v-lg p-o-md">
+        <div class="cienma-info-container bg-white m-t-xs relative" @tap="nextCinemaPage">
+            <div class="text-md text-line-20">{{cinemaInfo.name}}
+                <span class="m-l-sm text-xs text-gray" v-show="cinemaInfo.distance">距您{{cinemaInfo.distance}}</span>
+            </div>
+            <div class="text-sm text-gray text-line-20 over-omit" style="padding-right: 80rpx;">{{cinemaInfo.city}}{{cinemaInfo.address}}</div>
+            <div class="cinema-icon"><i-icon type="other" size="26" color="#ffa726" /></div>
+        </div>
+        <div class="select-time-container bg-white p-v-md p-o-md m-t-xs">
             <div class="timer-container p-t-sm p-b-md">
                 <h5 class="text-lg text-dark text-bold text-line-normal text-center">选择时间</h5>
                 <i-tabs :current="current" @change="tabChange" color="#f98d0f">
@@ -17,9 +39,9 @@
                     <i-tab :key="2" :title="'后天'+aftertomorrow"></i-tab>
                 </i-tabs>
                 <picker-view
-                    indicator-style="height: 50px;"
+                    indicator-style="height: 40px;"
                     indicator-class="selected-style"
-                    style="width: 100%; height: 460rpx; text-align: center;"
+                    style="width: 100%; height: 400rpx; text-align: center;"
                     :value="pickerVal"
                     @change="timeChange">
                     <picker-view-column>
@@ -33,9 +55,9 @@
                     </picker-view-column>
                 </picker-view>
             </div>
-            <div class="text-center" style="margin-top: 112rpx;">
-                <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">选定时间</button>
-            </div>
+        </div>
+        <div class="text-center m-t-lg buy-tickets">
+            <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">立即购票</button>
         </div>
         <i-modal-normal i-class="notice-modal" :visible="modal" ok-text="前往支付" cancel-text="取消订单" @ok="goPay" @cancel="cancelOrder">
             <div class="notice-modal-container">
@@ -49,6 +71,7 @@
 <script type="text/ecmascript-6">
     import api from '@/api'
     import occupy from '@/utils/isOccupy'
+    import calculatePrice from '@/utils/calculatePrice'
     export default {
         data () {
             return {
@@ -60,6 +83,7 @@
                 filmInfo: '',
                 cinemaInfo: '',
                 timeList: '',
+                priceInfo: [],
                 current: 0,
                 currentTime: 0,
                 selectTime: 0,
@@ -100,22 +124,47 @@
                 wx.showLoading({
                     title: '加载中',
                 })
-                this.$http.post(api.film.cinemaDetail, {
+                this.$http.post(api.film.details, {
                     cinema_id: cinema_id,
-                    film_id: film_id
+                    film_id: film_id,
+                    member_id: this.userInfo.user_id
                 }).then((res) => {
                     setTimeout(function () {
                         wx.hideLoading()
                     }, 500)
                     if (res.data.code === 1) {
-                        this.filmInfo = res.data.data.film
-                        this.cinemaInfo = res.data.data.cinema
-                        this.timeList = res.data.data.time
+                        this.filmInfo = res.data.data.filmInfo[0]
+                        this.timeList = res.data.data.useTime
+                        this.priceInfo = res.data.data.priceInfo
                         this.currentTime = parseInt(new Date().getTime() / 1000) + 3600
                         let endTime = this.currentTime + this.filmInfo.length * 60
                         this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList)
-                        this.status = this.hall_id ? ['可预订'] : ['不可预定']
+                        this.status = this.hall_id ? ['¥' + this.calculatePrice(this.currentTime, this.priceInfo)] : ['不可预定']
 
+                    } else {
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'error'
+                        })
+                    }
+                })
+            },
+            doCollect () {
+                if (!this.userInfo.user_mobile) return
+                this.$http.post(api.mine.collect, {
+                    version: '1.0.0',
+                    film_id: this.filmInfo.id
+                }, {
+                    headers: {
+                        'AuthToken': this.userInfo.auth_token
+                    }
+                }).then((res) => {
+                    if (res.data.code === 1) {
+                        this.filmInfo.fav_status = this.filmInfo.fav_status === 0 ? 1 : 0
+                        this.$Toast({
+                            content: res.data.msg,
+                            type: 'success'
+                        })
                     } else {
                         this.$Toast({
                             content: res.data.msg,
@@ -129,9 +178,8 @@
                 this.selectTime =this.pickerVal[0] * 60 * 60 + this.pickerVal[1] * 60
                 this.currentTime = new Date().setHours(0, 0, 0, 0) / 1000 + this.selectTime + this.current * 24 * 60 *60
                 let endTime = this.currentTime + this.filmInfo.length * 60
-                console.log(this.currentTime, endTime, '开始结束时间')
                 this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList)
-                this.status = this.hall_id ? ['可预订'] : ['不可预定']
+                this.status = this.hall_id ? ['¥' + this.calculatePrice(this.currentTime, this.priceInfo)] : ['不可预定']
             },
             timeChange(e) {
                 this.pickerVal = e.target.value
@@ -139,8 +187,7 @@
                 this.currentTime = new Date().setHours(0, 0, 0, 0) / 1000 + this.selectTime + this.current * 24 * 60 *60
                 let endTime = this.currentTime + this.filmInfo.length * 60
                 this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList) // 判断起止时间是否与list冲突   不冲突返回影仓id
-                console.log(this.currentTime, endTime, this.timeList, 'hall_id')
-                this.status = this.hall_id ? ['可预订'] : ['不可预定']
+                this.status = this.hall_id ? ['¥' + this.calculatePrice(this.currentTime, this.priceInfo)] : ['不可预定']
             },
             getPhoneNumber (e) {
                 this.$http.post(api.common.getTel, {
@@ -235,15 +282,28 @@
                     }
                 })
             },
+            nextCinemaPage () {
+                wx.navigateTo({
+                    url: '../cinema/main?film_id=' + this.filmInfo.id + '&cinema_id=' + this.cinemaInfo.id 
+                })
+            },
+            nextDetailPage () {
+                wx.navigateTo({
+                    url: '../filmIntro/main?id=' + this.filmInfo.id + '&cinema_id=' + this.cinemaInfo.id 
+                })
+            },
             goPay () {
                 wx.navigateTo({
                     url: '/pages/orderConfirm/main?trade_id=' + this.trade_id
                 })
             },
-            isOccupy: occupy
+            isOccupy: occupy,
+            calculatePrice: calculatePrice
+        },
+        onShow () {
+            this.modal = false
         },
         created () {
-            this.modal = false
             for (let i = 0; i < 24; i++) {
                 this.hours.push(i < 10 ? '0' + i : i + '')
             }
@@ -260,7 +320,17 @@
                 key: 'userInfo',
                 success(res) {
                     that.userInfo = res.data
-                    that.getFilmData(option.id, option.cinema_id)
+                    wx.getStorage({
+                        key: 'cinemaInfo',
+                        success(res1) {
+                            that.cinemaInfo = res1.data
+                            that.cinemaInfo.distance = that.cinemaInfo.distance > 1000 ? parseInt(that.cinemaInfo.distance / 100) / 10 + 'km' : that.cinemaInfo.distance + 'm'
+                            that.getFilmData(option.id, res1.data.id)
+                        },
+                        fail () {
+                            that.userInfo = {}
+                        }
+                    })
                 },
                 fail () {
                     that.userInfo = {}
@@ -283,13 +353,27 @@
         left: 40rpx;
         overflow: hidden;
     }
+    .search-result-item {
+        height: 340rpx;
+        padding: 16rpx 20rpx 30rpx 240rpx;
+    }
+    .poster-container {
+        width: 192rpx;
+        height: 280rpx;
+        position: absolute;
+        border-radius: 10rpx;
+        overflow: hidden;
+        top: 30rpx;
+        left: 20rpx;
+        background-color: #eee;
+    }
     .price-container {
         position: absolute;
         top: 40rpx;
         right: 20rpx;
     }
     .timer-container {
-        height: 660rpx;
+        height: 540rpx;
         border-radius: 72rpx;
         box-shadow: 2rpx 12rpx 18rpx 0 rgba(164, 160, 155, 0.28), 0 0 6rpx 0 rgba(0, 0, 0, 0.08);
     }
@@ -297,5 +381,41 @@
         box-shadow: 0 2px 4px 0 rgba(255, 167, 38, 0.43);
         background-color: rgba(255, 167, 38, 0.1);
         color: #ffa726;
+    }
+    .collect-btn {
+        margin-top: -18rpx;
+    }
+    .cienma-info-container {
+        height: 124rpx;
+        padding: 20rpx 20rpx;
+    }
+    .cinema-icon {
+        position: absolute;
+        top: 40rpx;
+        right: 26rpx;
+    } 
+    .enter-film-detail {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        top: 36rpx;
+        right: 20rpx;
+        background-color: #ffeacb;
+        border-radius: 50%;
+    }
+    .icon-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .buy-tickets {
+        position: absolute;
+        bottom: 40rpx;
+        left: 50%;
+        margin-left: -278rpx;
     }
 </style>

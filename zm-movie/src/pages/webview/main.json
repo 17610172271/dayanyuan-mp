@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "专题",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

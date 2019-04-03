@@ -1,15 +1,15 @@
 <template>
     <div class="border-top">
         <div class="p-sm">
-            <h5 class="text-xlg text-bold text-line-normal">{{orderInfo.film_name}} <span class="text-gray text-md">{{orderInfo.film_en_name}}</span></h5>
-            <div class="text-lg text-line-normal m-t-lg">观影时间: <span class="text-orange text-md p-l-sm">{{watch_time}}</span></div>
-            <div class="text-lg text-line-normal m-t-md">观影地点: <span class="p-l-sm">{{orderInfo.cinema_name}} {{orderInfo.hall_name}}</span></div>
-            <div class="text-gray text-line-normal m-t-sm" style="padding-left: 160rpx;">
-                {{orderInfo.cinema_address}}
-                <i-icon type="coordinates_fill" size="20" color="#ffa726" />
+            <div class="text-md text-line-normal" style="margin-top: 10rpx;">订单编号: <span class="text-gray text-sm p-l-sm">{{orderInfo.trade_id}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">影片名称: <span class="text-gray text-sm p-l-sm">{{orderInfo.film_name}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">观影时间: <span class="text-gray text-sm p-l-sm">{{watch_time}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">观影影院: <span class="text-gray text-sm p-l-sm">{{orderInfo.cinema_name}} {{orderInfo.hall_name}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">观影地点: <span class="text-gray text-sm p-l-sm">
+                {{orderInfo.cinema_address}}<i-icon type="coordinates_fill" size="16" color="#ffa726" /></span>
             </div>
-            <div class="text-lg text-line-normal m-t-sm">订单编号: <span class="p-l-sm">{{orderInfo.trade_id}}</span></div>
-            <div class="text-lg text-line-normal m-t-sm">订单总价: <span class="text-orange p-l-sm"><span class="text-sm">¥</span>{{orderInfo.trade_money}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">支付方式: <span class="text-gray text-sm p-l-sm">{{orderInfo.pay_type}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">订单金额: <span class="text-orange p-l-sm text-xxlg"><span class="text-sm">¥</span>{{orderInfo.trade_money - orderInfo.discount_money}}</span></div>
             <div class="text-center" style="margin-top: 200rpx;">
                 <button class="select-time-btn text-center" @tap="backHome">返回首页</button>
             </div>

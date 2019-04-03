@@ -1,82 +1,186 @@
 <template>
-    <div class="border-top">
+    <div class="">
         <!--搜索-->
-        <div class="home-top-container bg-white relative m-t-sm">
-            <a href="/pages/city/main" class="city-select"><span class="city-index-container">{{city}}</span><i-icon type="unfold" size="14" color="#030303" /></a>
-            <div class="search-box" style="margin-top: 2rpx;" @tap="goSearch">
-                <i-icon type="search" size="16" color="#ffa726" />
-                搜索影片
+        <div class="home-location-container">
+            <div class="cinema-info-container" v-if="!searchPageShow" @tap="nextCinemaPage">
+                <div class="text-lg">{{cinemaInfo.name}}</div>
+                <div class="text-xs text-gray p-v-sm" v-show="cinemaInfo.distance">距您{{(cinemaInfo.distance > 1000 ? (cinemaInfo.distance / 100  | Int) / 10 + 'km' : cinemaInfo.distance + 'm') || ''}}</div>
+                <div class="sm text-gray over-omit">{{cinemaInfo.city}}{{cinemaInfo.address}}</div>
             </div>
-            <a href="/pages/cinema/main" class="cinema-select"><i-icon type="other" size="34" color="#030303" /></a>
+            <div class="search-box relative" :animation="animationSearch" @tap="searchShow">
+                <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
+                <form action="">
+                    <input type="text" class="search-input search-ipt-container" v-model="searchText" :placeholder="placeholder" @confirm="doSearch">
+                </form>
+                <span class="search-cancel text-gray" v-if="searchPageShow" @click.stop="searchHide">取消</span>
+            </div>
         </div>
-        <div class="p-o-sm relative" v-if="cinemaInfo">
-            <div class="text-line-normal">{{cinemaInfo.name}} <span class="text-sm text-gray">距我{{cinemaInfo.distance}}m</span></div>
-            <div class="text-line-normal text-sm text-gray">{{cinemaInfo.address}}</div>
-            <div class="cinema-location"><i-icon type="coordinates_fill" size="20" color="#ffa726" /></div>
-        </div>
-        <!--轮播-->
-        <swiper
-            class="swiper-container m-t-sm bg-eee"
-            :indicator-dots="indicatorDots"
-            :autoplay="autoplay"
-            :interval="interval"
-            :duration="duration"
-            :circular="circular"
-            indicator-active-color="#ef6c00">
-            <block v-for="(item, index) in imgUrls" :key="item.id">
-                <swiper-item class="swiper-container">
-                    <image :src="item.image_url" class="slide-image" mode="widthFix" />
-                </swiper-item>
-            </block>
-        </swiper>
-        <!--分类-->
-        <div class="scroll-x-container">
-            <scroll-view scroll-x class="hotplay-title-container">
-                <div style="height: 50rpx;" :class="{'bg-eee': classList.length==0}">
-                    <span class="title-normal" :class="{'title-select': selectedClass===item.category}" v-for="(item, index) in classList" :key="index" @tap="selectClass(item.category)">{{item.category}}</span>
-                </div>
-            </scroll-view>
-        </div>
-
-        <div>
-            <scroll-view scroll-x class="hotplay-container">
-                <div class="image-container" v-for="(item, index) in selectedClassList" :key="item.id" @tap="selectCinema(item.id)">
-                    <div class="image-item-container bg-eee"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
-                    <div class="title-text title-p over-omit">{{item.title}}</div>
-                    <div class="subtitle-text p-l-sm">{{item.viewer || 0}}次观看</div>
-                </div>
-            </scroll-view>
-        </div>
-        <div class="border m-t-md"></div>
-        <!--每日推荐-->
-        <div>
-            <h3 class="day-recommend">每日推荐·你想看的都在这里</h3>
-            <div>
-                <div class="first-image-container" @tap="selectCinema(recommend.id)">
-                    <div class="first-image bg-eee"><image :src="recommend.image_url" class="slide-image" mode="widthFix"></image></div>
+        <div class="home-search-container" v-show="searchPageShow">
+            <div class="m-t-xs p-o-sm" v-if="listShow">
+                <div v-show="hotKeys.length>0">
+                    <div class="search-top-head text-line-normal text-gray text-md">热门搜索</div>
                     <div>
-                        <div class="title-text m-t-sm p-l-sm">{{recommend.title}}</div>
-                        <div class="subtitle-text p-l-sm" style="margin-top: 4rpx;">{{recommend.subtitleZ || 0}}次观看</div>
+                        <span class="hot-search-item bg-eee" v-for="(item, index) in hotKeys" :key="index" @tap="selectItem(item)">{{item}}</span>
+                    </div>
+                </div>
+                <div v-show="history.length>0">
+                    <div class="search-top-head text-line-normal text-gray text-md" style="margin-top: 30rpx;">历史搜索</div>
+                    <div>
+                        <span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index" @tap="selectItem(item)">{{item}}</span>
                     </div>
                 </div>
             </div>
-            <div class="m-t-sm p-o-sm p-b-sm" :class="{'p-b-xlg': !loading}">
-                <i-row>
-                    <i-col span="8" i-class="col-class" v-for="(item, index) in moreList" :key="item.id" @tap="selectCinema(item.id)">
-                        <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
-                            <div class="recommend-image-container bg-eee"><image :src="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
-                            <div>
-                                <div class="title-text m-t-sm over-omit">{{item.film_name}}</div>
-                                <div class="subtitle-text" style="margin-top: 4rpx;">{{item.viewer || 0}}次观看</div>
-                            </div>
-                        </div>
-                    </i-col>
-                </i-row>
-            </div>
-            <div class="p-sm" style="padding-bottom: 60rpx;" v-show="loading">
-                <i-load-more i-class="devide-container" tip="上拉加载更多" :loading="loading" />
+            <div class="search-result-container" v-else>
+                <ul>
+                    <li class="m-b-sm bg-white search-result-item relative" @tap="selectCinema(item.id)" v-for="(item,index) in data" :key="item.id">
+                        <div class="poster-container"><image :lazy-load="true" :src="item.image_url" v-if="item.image_url" class="slide-image" mode="scaleToFill"></image></div>
+                        <h5 class="text-lg text-line-normal over-omit">{{item.film_name}}</h5>
+                        <div class="text-sm text-gray text-line-20 m-t-sm over-omit">导演: {{item.director}}</div>
+                        <div class="text-sm text-gray text-line-20 over-omit">主演: {{item.actor}}</div>
+                        <div class="text-sm text-gray text-line-20 over-omit">类型: {{item.clazz}} <span class="pull-right text-xs text-orange">{{item.viewer || 0}}次观看</span></div>
+                    </li>
+                    <li class="text-orange p-sm text-center" v-if="data.length===0">没有搜索到影片</li>
+                </ul>
             </div>
         </div>
+        <div class="home-content-container m-b-lg" v-show="!searchPageShow">
+            <div v-for="(plate, plate_id) in homeData" :key="plate.id">
+                <!--轮播-->
+                <div v-if="plate.style_type==1" class="border-bottom p-b-sm">
+                    <swiper
+                        class="swiper-container bg-eee"
+                        :indicator-dots="indicatorDots"
+                        :autoplay="autoplay"
+                        :interval="interval"
+                        :duration="duration"
+                        :circular="circular"
+                        indicator-active-color="#ef6c00">
+                        <block v-for="(item, index) in plate.info" :key="item.id">
+                            <swiper-item class="swiper-container" @tap="nextTopicPage(item)">
+                                <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix" />
+                            </swiper-item>
+                        </block>
+                    </swiper>
+                </div>
+                <!--榜单-->
+                <div v-if="plate.style_type==2" class="border-bottom p-b-sm">
+                    <div class="scroll-x-container">
+                        <scroll-view scroll-x class="hotplay-title-container">
+                            <div style="height: 50rpx;" :class="{'bg-eee': classList.length==0}">
+                                <span class="title-normal" :class="{'title-select': selectedClass===item.plate_name}" v-for="(item, index) in classList" :key="index" @tap="selectClass(item.plate_name, item.info[0].id)">{{item.plate_name}}</span>
+                            </div>
+                        </scroll-view>
+                    </div>
+
+                    <div>
+                        <scroll-view scroll-x class="hotplay-container" :scroll-into-view="viewTo">
+                            <div class="image-container relative" style="padding-top: 7px;vertical-align: top;" v-for="(item, index) in selectedClassList" :key="item.id" :id="item.id" @tap="selectCinema(item.id)">
+                                <div class="image-item-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                                <div class="title-text title-p over-omit">{{item.title}}</div>
+                                <div class="subtitle-text p-l-sm over-omit">{{item.subtitle}}</div>
+                                <div class="num-icon num-icon1"v-if="index===0">NO.1</div>
+                                <div class="num-icon num-icon2" v-else-if="index===1">NO.2</div>
+                                <div class="num-icon num-icon3" v-else-if="index===2">NO.3</div>
+                                <div class="num-icon num-icon4" v-else-if="index===3">NO.4</div>
+                            </div>
+                        </scroll-view>
+                    </div>
+                </div>
+                
+                <!-- <div class="border m-t-md"></div> -->
+                <!-- 推荐一 -->
+                <div v-if="plate.style_type==3" class="border-bottom p-b-sm">
+                    <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
+                    <scroll-view scroll-x class="hotplay-container">
+                        <div class="image-container vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
+                            <div class="image-item-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                            <div class="title-text title-p over-omit">{{item.title}}</div>
+                            <div class="subtitle-text p-l-sm over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
+                        </div>
+                    </scroll-view>
+                </div>
+                <!--推荐二-->
+                <div v-if="plate.style_type==4" class="border-bottom p-b-sm">
+                    <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
+                    <div class="">
+                        <i-row>
+                            <i-col span="8" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
+                                <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
+                                    <div class="recommend-image-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                                    <div>
+                                        <div class="title-text m-t-sm over-omit">{{item.title}}</div>
+                                        <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
+                                    </div>
+                                </div>
+                            </i-col>
+                        </i-row>
+                    </div>
+                    <!-- <div class="p-sm" style="padding-bottom: 60rpx;" v-show="loading">
+                        <i-load-more i-class="devide-container" tip="上拉加载更多" :loading="loading" />
+                    </div> -->
+                </div>
+                <!-- 推荐三 -->
+                <div class="border-bottom p-b-sm" v-if="plate.style_type == 5">
+                    <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
+                    <div class="">
+                        <i-row>
+                            <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
+                                <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
+                                    <div class="recommend3-image-container bg-eee">
+                                        <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
+                                    </div>
+                                    <div>
+                                        <div class="title-text m-t-xs over-omit">{{item.title}}</div>
+                                        <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
+                                    </div>
+                                </div>
+                            </i-col>
+                        </i-row>
+                    </div>
+                </div>
+                <!-- 专题一 -->
+                <div class="border-bottom p-b-sm" v-if="plate.style_type == 6">
+                    <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
+                    <div class="">
+                        <i-row>
+                            <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="nextTopicPage(item)">
+                                <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
+                                    <div class="recommend3-image-container bg-eee">
+                                        <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
+                                    </div>
+                                    <div>
+                                        <div class="title-text m-t-xs over-omit">{{item.title}}</div>
+                                        <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
+                                    </div>
+                                </div>
+                            </i-col>
+                        </i-row>
+                    </div>
+                    <div class="text-center text-orange" @tap="changeTopic(plate, plate_id)"><span><i-icon type="refresh" size="16" color="#ffa726" />换一换</span></div>
+                </div>
+                <!-- 专题二 -->
+                <div class="border-bottom p-b-sm" v-if="plate.style_type == 7">
+                    <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
+                    <div class="">
+                        <i-row>
+                            <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="nextTopicPage(item)">
+                                <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
+                                    <div class="recommend3-image-container bg-eee">
+                                        <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
+                                    </div>
+                                    <div>
+                                        <div class="title-text m-t-xs over-omit">{{item.title}}</div>
+                                        <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
+                                    </div>
+                                </div>
+                            </i-col>
+                        </i-row>
+                    </div>
+                </div>
+            </div>
+            <div class="p-v-sm text-sm text-gray text-center" v-if="loadall" style="padding-bottom: 100rpx;">────── 已经加载完毕 ──────</div>
+        </div>
+        
         <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
                 <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
@@ -93,7 +197,7 @@
             </div>
         </i-modal>
         <i-toast id="toast" />
-        <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00">
+        <i-tab-bar :current="currentTab" @change="tabChange" :fixed="true" color="#ef6c00" v-if="!searchPageShow">
             <i-tab-bar-item key="homepage" img="/static/img/ic-hot-nor@3x.png" current-img="/static/img/ic-hot-cat@3x.png" title="热映"></i-tab-bar-item>
             <i-tab-bar-item key="code" icon="scan" current-icon="scan" title="扫码"></i-tab-bar-item>
             <i-tab-bar-item key="mine" img="/static/img/ic-me-nor@3x.png" current-img="/static/img/ic-me@3x.png" title="我的"></i-tab-bar-item>
@@ -103,20 +207,24 @@
 
 <script type="text/ecmascript-6">
 import api from '@/api'
-
 export default {
     data () {
         return {
+            placeholder: '搜索',
+            refresh: false,
             city: '北京',
-            cinemaInfo: '',
-            imgUrls: [],
+            city_id: '110000',
+            cinemaInfo: {
+                distance : 0
+            },
+            homeData: [],
             classList: [],
+            location: [],
             selectedClass: '',
             selectedClassList: [],
-            recommend: {},
-            moreList: [],
             page: 1,
-            page_size: 30,
+            page_size: 3,
+            loadall: false,
             loading: true,
             currentTab: 'homepage',
             indicatorDots: true,
@@ -128,85 +236,59 @@ export default {
             modal1: false,
             modal2: false,
             userInfo: '',
+            searchPageShow: false,
+            listShow: true,
+            animationSearch: '',
+            searchText: '',
+            history: [],
+            data: [],
+            search_page: 1,
+            search_page_size: 30,
+            hotKeys: [],
             orderInfo: {
                 count_down: 0
-            }
+            },
+            viewTo: ''
         }
     },
     methods: {
-        getData () {
+        getHomeList () {
             wx.showLoading({
               title: '加载中',
             })
-            this.getBannerList()
-            this.getClassList()
-            this.getRecommondList()
-            this.getMoreList()
-        },
-        getBannerList () {
-            this.$http.post(api.film.banner, {
+            this.$http.post(api.film.home, {
                 version: '1.0.0',
-                client_type: 3
+                client_type: 3,
+                city_id: this.city_id || '',
+                page: this.page,
+                page_size: this.page === 1 ? 5 : this.page_size
             }).then((res) => {
                 setTimeout(function () {
                     wx.hideLoading()
                 }, 500)
                 if (res.data.code === 1) {
-                    this.imgUrls = res.data.data
-                } else {
-                    this.$Toast({
-                        content: res.data.msg,
-                        type: 'error'
-                    })
-                }
-            })
-        },
-        getClassList () {
-            this.$http.post(api.film.class, {
-                version: '1.0.0'
-            }).then((res) => {
-                if (res.data.code === 1) {
-                    this.classList = res.data.data
-                    this.selectedClass = this.classList[0] ? this.classList[0].category : ''
-                    this.selectedClassList = this.classList[0] ? this.classList[0].films : ''
-                } else {
-                    this.$Toast({
-                        content: res.data.msg,
-                        type: 'error'
-                    })
-                }
-            })
-        },
-        getRecommondList () {
-            this.$http.post(api.film.recommend, {
-                version: '1.0.0'
-            }).then((res) => {
-                if (res.data.code === 1) {
-                    this.recommend = res.data.data
-                } else {
-                    this.$Toast({
-                        content: res.data.msg,
-                        type: 'error'
-                    })
-                }
-            })
-        },
-        getMoreList () {
-            this.loading = true
-            this.$http.post(api.film.more, {
-                version: '1.0.0',
-                page: this.page,
-                page_size: this.page_size
-            }).then((res) => {
-                let that = this
-                setTimeout(function () {
-                    that.loading = false
-                }, 1000)
-                if (res.data.code === 1) {
-                    if (this.page === 1) this.moreList = []
-                    this.moreList = this.moreList.concat(res.data.data.films)
-                    if (res.data.data.films.length > 0) {
+
+                    if (res.data.data.item.length > 0) {
                         this.page += 1
+                    } else {
+                        this.loadall = true
+                    }
+                    if (this.homeData.length > 0) {
+                        this.homeData = this.homeData.concat(res.data.data.item)
+                    } else {
+                        this.homeData = res.data.data.item
+                    }
+                    let rankArr = []
+                    this.homeData.map((val, index) => {
+                        if (val.style_type === '2') {
+                            this.classList.push(val)
+                            rankArr.push(index)
+                        }
+                    })
+                    if (this.classList.length > 0) {
+                        this.selectedClassList = this.classList[0].info
+                        this.selectedClass = this.classList[0].plate_name
+                        this.homeData.splice(rankArr[0], rankArr.length, {style_type: '2'})
                     }
                 } else {
                     this.$Toast({
@@ -216,23 +298,165 @@ export default {
                 }
             })
         },
-        selectClass (className) {
-            this.selectedClass = className
-            this.classList.map(val => {
-                if (val.category === className) {
-                    this.selectedClassList = val.films
+
+        // 搜索
+        getSearchList (type) {
+            wx.showLoading({
+                title: '加载中',
+            })
+            this.$http.post(api.film.searchResult, {
+                version: '1.0.0',
+                title: this.searchText,
+                page: this.search_page,
+                page_size: this.search_page_size
+            }).then(res => {
+                setTimeout(function () {
+                    wx.hideLoading()
+                }, 500)
+                this.listShow = false
+                if (res.data.code === 1) {
+                    if (type) {
+                        this.data = this.data.concat(res.data.data.films)
+                    } else {
+                        this.data = res.data.data.films
+                    }
+                    if (res.data.data.films.length > 0) {
+                        this.search_page += 1
+                    }
+                } else {
+                    this.data = []
+                    this.$Toast({
+                        content: res.data.msg,
+                        type: 'error'
+                    })
                 }
             })
         },
-        selectCinema (id) {
+        getCinemaList () {
+            let that = this
+            wx.getStorage({
+                key: 'cinemaInfo',
+                success(res) {
+                    that.cinemaInfo = res.data || ''
+                },
+                fail () {
+                    that.$http.post(api.common.cinemaNearby, {
+                        version: '1.0.0',
+                        center: that.location.length === 2 ? that.location.join(',') : '116.403847,39.915526',
+                        city: that.city || '北京',
+                        limit: 1,
+                        page: 1,
+                        radius: 50000,
+                        keywords: ''
+                    }).then(res => {
+                        if (res.data.code === 1) {
+                            that.cinemaInfo = res.data.data.cinemas[0]
+                            wx.setStorage({
+                                key: 'cinemaInfo',
+                                data: res.data.data.cinemas[0]
+                            })
+                        } else {
+                            that.cinemaInfo = ''
+                            that.$Toast({
+                                content: res.data.msg,
+                                type: 'error'
+                            })
+                        }
+                    })
+                }
+            })
+        },
+        getHotKeys () {
+            this.$http.post(api.film.hotKeys, {
+                version: '1.0.0'
+            }).then(res => {
+                if (res.data.code === 1) {
+                    this.hotKeys = res.data.data
+                } else {
+                    this.hotKeys = []
+                    this.$Toast({
+                        content: res.data.msg,
+                        type: 'error'
+                    })
+                }
+            })
+        },
+        selectItem (keywords) {
+            this.searchText = keywords
+            this.doSearch()
+        },
+        doSearch () {
+            this.search_page = 1
+            this.getSearchList()
+            if (this.searchText && this.history.indexOf(this.searchText) === -1) {
+                this.history.push(this.searchText)
+                wx.setStorage({
+                    key: 'history',
+                    data: this.history
+                })
+            }
+        },
+        nextCinemaPage () {
+            wx.navigateTo({
+                url: '../cinema/main'
+            })
+        },
+        nextPage (id) {
             wx.navigateTo({
                 url: '../filmIntro/main?id=' + id
             })
         },
-        goSearch () {
-            wx.navigateTo({
-                url: '../search/main'
+        searchShow () {
+            let animation = wx.createAnimation({
+                duration: 400,
+                timingFunction: "ease-in",
+                delay: 0,
+                transformOrigin: "50% 50%",
+
             })
+            //设置动画
+            animation.width('710rpx').step()
+            this.animationSearch = animation.export()
+            this.searchPageShow = true
+        },
+        searchHide () {
+            let animation = wx.createAnimation({
+                duration: 400,
+                timingFunction: "ease-in",
+                delay: 0,
+                transformOrigin: "50% 50%",
+
+            })
+            //设置动画
+            animation.width('160rpx').step()
+            this.animationSearch = animation.export()
+            this.searchPageShow = false
+        },
+        selectClass (className, id) {
+            this.selectedClass = className
+            this.classList.map(val => {
+                if (val.plate_name === className) {
+                    this.selectedClassList = val.info
+                }
+            })
+            this.viewTo = id
+        },
+        selectCinema (id) {
+            wx.navigateTo({
+                url: '../timeSelect/main?id=' + id
+            })
+        },
+        nextTopicPage (item) {
+            if (item.content_url.indexOf('web/webview') > -1) {
+                let url = decodeURIComponent(item.content_url.slice(item.content_url.indexOf('web/webview') + 16)).replace('?', '&')
+                wx.navigateTo({
+                    url: '../webview/main?website=' + url
+                })
+                console.log(url)
+            } else {
+                this.selectCinema(item.id)
+            }
+            
         },
         doOk () {
             this.modal = false
@@ -250,7 +474,6 @@ export default {
                 // 扫码开舱
                 wx.scanCode({
                     success(res) {
-                        console.log(res, '二维码url')
                         let hall_id = res.result.slice(res.result.indexOf('hall_id=')).split('=')[1]
                         if (!hall_id) {
                             that.$Toast({
@@ -311,33 +534,42 @@ export default {
                 })
             }
         },
-        getCinemaInfo () {
-            let that = this
-            wx.getStorage({
-                key: 'cinemaInfo',
-                success(res) {
-                    that.cinemaInfo = res.data || ''
-                },
-                fail () {
-                    that.cinemaInfo = ''
-                }
-            })
-        },
         getCity () {
             let that = this
             wx.getStorage({
                 key: 'location',
                 success(res) {
                     that.city = res.data.city || '北京'
+                    that.city_id = res.data.city_id
                     that.city = that.city.replace('市', '')
+                    that.location = res.data.location
+                    // if (that.city_id) that.getHomeList()
+                    if (res.data.location && res.data.city) that.getCinemaList()
                     if (that.city.length > 2) {
                         that.city = that.city.slice(0, 2) + '..'
                     } else {
                         that.city = that.city
                     }
+                    that.getLocation(1)
                 },
                 fail () {
                     that.city = '北京'
+                    that.getLocation(2)
+                }
+            })
+        },
+        changeTopic (topic, index) {
+            this.$http.post(api.film.topicChange, {
+                version: '1.0.0',
+                id: topic.id
+            }).then((res) => {
+                if (res.data.code === 1) {
+                    this.homeData[index].info = res.data.data.info
+                } else {
+                    this.$Toast({
+                        content: res.data.msg,
+                        type: 'error'
+                    })
                 }
             })
         },
@@ -351,7 +583,7 @@ export default {
                 return time + '分钟'
             }
         },
-        getLocation () {
+        getLocation (isLocation) {
             let that = this
             // 获取用户信息及地理位置授权并存储城市位置信息
             wx.getSetting({
@@ -364,20 +596,25 @@ export default {
                                 type: 'wgs84',
                                 success(res) {
                                     let location = [res.longitude, res.latitude]
+                                    that.location = [res.longitude, res.latitude]
                                     let city = ''
                                     let id = ''
                                     that.$http.get('https://restapi.amap.com/v3/geocode/regeo?output=json&location=' + res.longitude + ',' + res.latitude + '&key=602d412b5c8841798676c8fc4a8aa094&extensions=all').then((res) => {
                                         that.city = city = res.data.regeocode.addressComponent.city.length === 0 ? res.data.regeocode.addressComponent.province : res.data.regeocode.addressComponent.city
-                                        wx.setStorage({
-                                            key: 'location',
-                                            data: {
-                                                location: location,
-                                                city: city,
-                                                locationCity: city,
-                                                city_id: id
-                                            }
-                                        })
+                                        if (isLocation === 2) {
+                                            wx.setStorage({
+                                                key: 'location',
+                                                data: {
+                                                    location: location,
+                                                    city: city,
+                                                    locationCity: city,
+                                                    city_id: id
+                                                }
+                                            })
+                                        }
+                                        
                                         that.city = that.city.replace('市', '')
+                                        that.getCinemaList()
                                         that.$http.post(api.common.cityList, {
                                             version: '1.0.0'
                                         }).then((res) => {
@@ -385,23 +622,37 @@ export default {
                                                 res.data.data.cities.map(val => {
                                                     if (val.city === city) {
                                                         id = val.id ||val.city_code
-                                                        wx.setStorage({
-                                                            key: 'location',
-                                                            data: {
-                                                                location: location,
-                                                                city: city,
-                                                                locationCity: city,
-                                                                city_id: id
-                                                            }
-                                                        })
+                                                        that.city_id = id
+                                                        that.getHomeList()
+                                                        if (isLocation === 2) {
+                                                            wx.setStorage({
+                                                                key: 'location',
+                                                                data: {
+                                                                    location: location,
+                                                                    city: city,
+                                                                    locationCity: city,
+                                                                    city_id: id
+                                                                }
+                                                            })
+                                                        }
                                                         that.city = that.city.replace('市', '')
                                                     }
                                                 })
+                                            } else {
+                                                that.getHomeList()
                                             }
                                         })
                                     })
+                                },
+                                fail () {
+                                    that.getCinemaList()
+                                    that.getHomeList()
                                 }
                             })
+                        },
+                        fail () {
+                            that.getCinemaList()
+                            that.getHomeList()
                         }
                     })
                 }
@@ -409,10 +660,18 @@ export default {
         }
     },
     onReachBottom () {
-        this.getMoreList()
+        if (this.searchPageShow) {
+            this.getSearchList('more')
+        } else {
+            this.getHomeList()
+        }
     },
     created () {
         let that = this
+        this.page = 1
+        this.listShow = true
+        this.getCity()
+        this.getHotKeys()
         wx.login({
             success: function(res) {
                 if (res.code) {
@@ -440,38 +699,95 @@ export default {
         })
     },
     onShow () {
-        this.page = 1
-        this.getData()
-        this.getCinemaInfo()
-        this.getCity()
-        // this.getLocation()
+        let that = this
+        if (this.refresh) {
+            this.homeData = []
+            this.classList = []
+            this.selectedClassList = []
+            this.page = 1
+            this.getCity()
+        }
+        this.searchHide()
+        this.searchPageShow = false
+        this.listShow = true
+        this.data = []
+        this.searchText = ''
+        
+        // 获取搜索历史
+        wx.getStorage({
+            key: 'history',
+            success(res) {
+                that.history = res.data || []
+            },
+            fail () {
+                that.history = []
+            }
+        })
+    },
+    onLoad (option) {
+        this.refresh = option.type ? true : false
     },
     onLaunch () {
-        this.getData()
-        this.getCinemaInfo()
         this.getCity()
-        this.getLocation()
+    },
+    watch: {
+        searchPageShow (val) {
+            let that = this
+            if (!val) {
+                this.searchText = ''
+                this.listShow = true
+                this.placeholder = '搜索'
+            } else {
+                this.placeholder = ''
+                setTimeout(function () {
+                    that.placeholder = '搜索影片'
+                }, 400)
+            }
+        }
     }
 }
 </script>
 
 <style scoped>
-    .home-top-container {
-        padding: 0 94rpx 20rpx 130rpx;
+    .home-location-container {
+        height: 132rpx;
+        padding: 0 16rpx;
     }
-    .city-select {
-        position: absolute;
-        left: 0;
-        top: 0;
-        padding: 20rpx 18rpx;
+    .search-box {
         font-size: 28rpx;
-        color: #030303;
+        color: #b0b1b3;
+        height: 68rpx;
+        padding: 0 108rpx 0 30rpx;
+        line-height: 76rpx;
+        border-radius: 34rpx;
+        box-shadow: 0 4rpx 4rpx 0 rgba(0, 0, 0, 0.04), 0 0 4rpx 0 rgba(0, 0, 0, 0.12);
+        background-color: #ffffff;
+        position: absolute;
+        top: 10rpx;
+        right: 20rpx;
+        width: 160rpx;
+        overflow: hidden;
     }
-    .cinema-select {
+    .search-input {
+        height: 68rpx;
+        line-height: 68rpx;
+        padding-left: 10rpx;
+        color: #666;
+    }
+    .search-box .search-box-icon {
+        margin-top: -4rpx;
+    }
+    .search-cancel {
         position: absolute;
         top: 0;
         right: 0;
-        padding: 4rpx 14rpx;
+        font-size: 12px;
+        display: inline-block;
+        text-align: center;
+        height:70rpx;
+        line-height:70rpx;
+        padding: 0 30rpx;
+        z-index: 9999;
     }
     .swiper-container {
         width: 100%;
@@ -482,9 +798,15 @@ export default {
     }
     .hotplay-title-container {
         width: 100%;
-        padding: 34rpx 18rpx 32rpx 18rpx;
+        padding: 34rpx 18rpx 30rpx 18rpx;
         line-height: 48rpx;
         white-space: nowrap;
+    }
+    .title-text {
+        padding-left: 20rpx;
+    }
+    .subtitle-text {
+        padding-left: 20rpx;
     }
     .title-normal {
         color: #9a9a9a;
@@ -517,7 +839,7 @@ export default {
         font-size: 36rpx;
         line-height: 48rpx;
         font-weight: bold;
-        padding: 32rpx 0 40rpx 20rpx;
+        padding: 32rpx 0 40rpx 16rpx;
     }
     .first-image {
         height: 340rpx;
@@ -528,6 +850,11 @@ export default {
         border-radius: 8rpx;
         overflow: hidden;
     }
+    .recommend3-image-container {
+        height: 216rpx;
+        border-radius: 8rpx;
+        overflow: hidden;
+    }
     .p-r-xs {
         padding-right: 10rpx;
     }
@@ -535,29 +862,69 @@ export default {
         padding-left: 5rpx;
         padding-right: 5rpx;
     }
-    .p-l-xs {
-        padding-left: 10rpx;
+    .hot-search-item {
+        display: inline-block;
+        padding: 6rpx 18rpx;
+        margin: 20rpx 16rpx 0 0;
+        line-height: 48rpx;
+        border-radius: 8rpx;
     }
-    .search-box {
-        font-size: 28rpx;
-        color: #b0b1b3;
-        height: 68rpx;
-        padding: 0 30rpx;
-        line-height: 76rpx;
-        border-radius: 34rpx;
-        box-shadow: 0 4rpx 4rpx 0 rgba(0, 0, 0, 0.04), 0 0 4rpx 0 rgba(0, 0, 0, 0.12);
-        background-color: #ffffff;
+    .search-result-container {
+        margin-top: 20rpx;
+        background-color: #f5f5f5;
     }
-    .cinema-location {
+    .search-result-item {
+        height: 244rpx;
+        padding: 20rpx 20rpx 20rpx 190rpx;
+    }
+    .poster-container {
+        width: 140rpx;
+        height: 200rpx;
         position: absolute;
         top: 20rpx;
-        right: 20rpx;
+        left: 20rpx;
     }
-    .city-index-container {
-        max-width: 80rpx;
+    .num-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 25px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        text-align: center;
+        color: rgba(255,255,255,0.87);
+        font-size: 10px;
+        padding-top: 6px;
+    }
+    .num-icon1 {
+        background-image: url(../../../static/img/bg-no-1-red@3x.png);
+    }
+    .num-icon2 {
+        background-image: url(../../../static/img/bg-no-2-red@3x.png);
+    }
+    .num-icon3 {
+        background-image: url(../../../static/img/bg-no-3-red@3x.png);
+    }
+    .num-icon4 {
+        background-image: url(../../../static/img/bg-no-4-red@3x.png);
+    }
+    .day-recommend-img {
         display: inline-block;
+        width: 36rpx;
+        height: 32rpx;
+        background: url(../../../static/img/zero-yellow@3x.png) no-repeat;
+        background-size: cover;
+        margin-right: 14rpx;
     }
-    .p-b-xlg {
-        padding-bottom: 100rpx;
+    .search-ipt-container {
+        min-width: 40px;
+        position: absolute;
+        top: 1px;
+        left: 28px;
+        width: 80%;
+    }
+    .vertical-top {
+        vertical-align: top;
     }
 </style>

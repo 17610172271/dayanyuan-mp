@@ -17,15 +17,18 @@ export const common = {
 }
 // 影片
 export  const film = {
+    home: 'api/v1/filmSort/list', // 首页排片数据
     banner: '/api/v1/movies/column/contents', // 轮播
     class: '/api/v1/movies/category', // 分类
     more: '/api/v1/movies/list', // 更多列表
     recommend: '/api/v1/movies/recommend', // 每日推荐
     detail: '/api/v1/movies/detail', // 影片详情
+    details: 'api/v1/film/detail', // 新版影片详情
     cinemaList: '/api/v1/movies/cinema', // 影片下影院列表
     cinemaDetail: '/api/v1/cinema/hallTimesList', // 选择时间=>影院及影片信息
     searchResult: '/api/v1/movies/search/results', // 搜索结果
     hotKeys: '/api/v1/movies/search/keywords/hot', // 热门关键词
+    topicChange: 'api/v1/filmSort/oneSpecialList', // 专题换一换
 }
 // 我的
 export  const mine = {

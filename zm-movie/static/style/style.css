@@ -42,6 +42,7 @@ ul, ol {
 img {
     border: none;
     vertical-align: middle;
+    width: 100%;
 }
 
 a {
@@ -174,6 +175,10 @@ textarea {
 
 .text-bolder {
     font-weight: bolder;
+}
+
+.text-xs {
+    font-size: 20rpx;
 }
 
 .text-sm {
@@ -579,5 +584,7 @@ textarea {
     outline: none;
     border: 0;
 }
-
+.text-line-18 {
+    line-height: 36rpx;
+}
 

@@ -8,6 +8,7 @@
     "i-tab-bar-item": "../../../static/iView/tab-bar-item/index",
     "i-divider": "../../../static/iView/divider/index",
     "i-load-more": "../../../static/iView/load-more/index",
-    "i-toast": "../../../static/iView/toast/index"
+    "i-toast": "../../../static/iView/toast/index",
+    "i-input": "../../../static/iView/input/index"
   }
 }

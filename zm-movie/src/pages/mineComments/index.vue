@@ -2,7 +2,7 @@
     <div class="search-result-container border-top">
         <div class="m-b-sm bg-white search-result-item relative">
             <div class="poster-container bg-eee"><image :src="filmInfo.image_url" class="slide-image" mode="scaleToFill"></image></div>
-            <h5 class="text-lg text-line-normal">{{filmInfo.film_name}} <span class="text-sm text-gray">2018年5月17日 12:24:54</span></h5>
+            <h5 class="text-lg text-line-normal">{{filmInfo.film_name}}</h5>
             <div class="text-sm text-dark text-line-20 m-t-xs">{{cinema_name}}</div>
             <div class="text-sm text-gray text-line-20 m-t-xs">{{cinema_address}}</div>
         </div>

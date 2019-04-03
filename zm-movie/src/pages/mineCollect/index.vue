@@ -1,13 +1,13 @@
 <template>
     <div class="search-result-container border-top">
         <ul>
-            <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in data" :key="item.id" v-if="item.is_collect">
+            <li class="m-b-sm bg-white search-result-item relative" v-for="(item,index) in data" :key="item.id" @tap="goFilmDetail(item.id)">
                 <div class="poster-container bg-eee"><image :src="item.pic" class="slide-image" mode="scaleToFill"></image></div>
                 <h5 class="text-lg text-line-normal">
                     {{item.title}}
-                    <div class="p-sm pull-right" @tap="doCollect(item)">
-                        <i-icon type="like_fill" v-if="!item.is_collect" size="20" color="#edeced" />
-                        <i-icon type="like_fill" v-else size="20" color="#ff4747" />
+                    <div class="p-sm pull-right" @tap.stop="doCollect(item)">
+                        <i-icon type="collection_fill" v-if="!item.is_collect" size="20" color="#edeced" />
+                        <i-icon type="collection_fill" v-else size="20" color="#ff4747" />
                     </div>
                 </h5>
                 <div class="text-sm text-gray text-line-20 m-t-sm over-omit">导演: {{item.director}}</div>
@@ -73,6 +73,11 @@
                             type: 'error'
                         })
                     }
+                })
+            },
+            goFilmDetail (id) {
+                wx.navigateTo({
+                    url: '../timeSelect/main?id=' + id
                 })
             },
             doCollect (item) {

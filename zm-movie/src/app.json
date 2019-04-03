@@ -18,7 +18,8 @@
     "pages/orderDetail/main",
     "pages/orderConfirm/main",
     "pages/timeSelect/main",
-    "pages/mineComments/main"
+    "pages/mineComments/main",
+    "pages/webview/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
