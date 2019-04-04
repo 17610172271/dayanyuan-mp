@@ -9,7 +9,7 @@
             <div class="text-bold text-orange text-line-normal" style="margin-top: 14rpx;">{{orderInfo.cinema_address}} {{orderInfo.cinema_name}} {{orderInfo.hall_name}}</div>
             <div class="m-t-md border-top-dashed clear p-t-lg">
                 <div class="pull-left m-l-md">总票价</div>
-                <div class="pull-right text-sm text-orange">¥ <span class="text-xxlg">{{orderInfo.trade_money - orderInfo.discount_money}}</span></div>
+                <div class="pull-right text-sm text-orange">¥ <span class="text-xxlg">{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div>
             </div>
         </div>
         <div class="p-md">

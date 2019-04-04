@@ -8,7 +8,7 @@
                 <div class="search-box relative" :animation="animationSearch" @tap="searchShow">
                     <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
                     <form action="" class="">
-                        <input type="text" class="search-input search-ipt-container" v-model="searchText" :placeholder="placeholder" @confirm="doSearch">
+                        <input type="text" class="search-input search-ipt-container" confirm-type="search" v-model="searchText" :placeholder="placeholder" @confirm="doSearch">
                     </form>
                     <span class="search-cancel text-gray" v-if="searchPageShow" @click.stop="searchHide">取消</span>
                 </div>

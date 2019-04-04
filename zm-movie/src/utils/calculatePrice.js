@@ -6,7 +6,7 @@ const calculatePrice = function (startTime, priceInfo) {
     let hour = new Date(startTime * 1000).getHours()
     let ruleList = []
     if (priceInfo.length ===0) {
-        price = 0
+        price = ''
     } else {
         priceInfo.map(val => {
             if(val.type === 1 || val.type === '1') {

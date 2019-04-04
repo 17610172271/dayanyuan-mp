@@ -14,7 +14,7 @@
                 <div class="m-t-sm text-xlg text-line-20 text-orange">{{filmInfo.score}} <span class="text-sm">分</span></div>
                 <div class="text-sm text-gray text-line-18 over-omit">导演: {{filmInfo.director}}</div>
                 <div class="text-sm text-gray text-line-18 over-omit">主演: {{filmInfo.actor}}</div>
-                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.clazz}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.class}}</div>
                 <div class="text-sm text-gray text-line-18">上映: {{filmInfo.release_date}}</div>
                 <div class="text-sm text-gray text-line-18">时长: {{filmInfo.length || 0}}分钟 <span class="pull-right text-xs text-orange">{{filmInfo.viewer || 0}}次观看</span></div>
             </div>

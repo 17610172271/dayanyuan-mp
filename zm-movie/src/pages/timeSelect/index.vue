@@ -1,7 +1,10 @@
 <template>
     <div class="border-top bg-f5">
         <div class="bg-white search-result-item relative">
-            <div class="poster-container"><image v-if="filmInfo.cover" :src="filmInfo.cover" class="slide-image" mode="scaleToFill"></image></div>
+            <div class="poster-container relative">
+                <image v-if="filmInfo.cover" :src="filmInfo.cover" class="slide-image" mode="scaleToFill"></image>
+                <div class="home-score-container" style="padding-right: 20rpx;">{{filmInfo.score}}</div>
+            </div>
             <h5 class="text-lg text-line-normal over-omit" style="height: 48rpx;">
                 {{filmInfo.film_name}}
                 <button class="pull-right collect-btn" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="doCollect">
@@ -13,7 +16,7 @@
             <div class="relative" @tap="nextDetailPage">
                 <div class="text-sm text-gray text-line-18 m-t-sm over-omit">导演: {{filmInfo.director}}</div>
                 <div class="text-sm text-gray text-line-18 over-omit">主演: {{filmInfo.actor}}</div>
-                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.clazz}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.class}}</div>
                 <div class="text-sm text-gray text-line-18">上映: {{filmInfo.release_date}}</div>
                 <div class="text-sm text-gray text-line-18">时长: {{filmInfo.length || 0}}分钟</div>
                 <div class="enter-film-detail"><i-icon type="enter" class="icon-center" size="16" color="#ffa726" /></div>
@@ -139,7 +142,7 @@
                         this.currentTime = parseInt(new Date().getTime() / 1000) + 3600
                         let endTime = this.currentTime + this.filmInfo.length * 60
                         this.hall_id = this.isOccupy(this.currentTime, endTime, this.timeList)
-                        this.status = this.hall_id ? ['¥' + this.calculatePrice(this.currentTime, this.priceInfo)] : ['不可预定']
+                        this.status = this.hall_id ? [this.calculatePrice(this.currentTime, this.priceInfo) === '' ? '不可预订' : ('¥' + this.calculatePrice(this.currentTime, this.priceInfo))] : ['不可预定']
 
                     } else {
                         this.$Toast({

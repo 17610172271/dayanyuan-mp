@@ -9,7 +9,7 @@
                 {{orderInfo.cinema_address}}<i-icon type="coordinates_fill" size="16" color="#ffa726" /></span>
             </div>
             <div class="text-md text-line-normal m-t-sm">支付方式: <span class="text-gray text-sm p-l-sm">{{orderInfo.pay_type}}</span></div>
-            <div class="text-md text-line-normal m-t-sm">订单金额: <span class="text-orange p-l-sm text-xxlg"><span class="text-sm">¥</span>{{orderInfo.trade_money - orderInfo.discount_money}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">订单金额: <span class="text-orange p-l-sm text-xxlg"><span class="text-sm">¥</span>{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div>
             <div class="text-center" style="margin-top: 200rpx;">
                 <button class="select-time-btn text-center" @tap="backHome">返回首页</button>
             </div>

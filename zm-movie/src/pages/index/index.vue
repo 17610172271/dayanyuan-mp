@@ -3,14 +3,14 @@
         <!--搜索-->
         <div class="home-location-container">
             <div class="cinema-info-container" v-if="!searchPageShow" @tap="nextCinemaPage">
-                <div class="text-lg">{{cinemaInfo.name}}</div>
+                <div class="text-lg">{{cinemaInfo.name}}<i-icon color="#030303" type="enter" /></div>
                 <div class="text-xs text-gray p-v-sm" v-show="cinemaInfo.distance">距您{{(cinemaInfo.distance > 1000 ? (cinemaInfo.distance / 100  | Int) / 10 + 'km' : cinemaInfo.distance + 'm') || ''}}</div>
                 <div class="sm text-gray over-omit">{{cinemaInfo.city}}{{cinemaInfo.address}}</div>
             </div>
             <div class="search-box relative" :animation="animationSearch" @tap="searchShow">
                 <i-icon type="search" class="pull-left search-box-icon" size="16" color="#ffa726" />
                 <form action="">
-                    <input type="text" class="search-input search-ipt-container" v-model="searchText" :placeholder="placeholder" @confirm="doSearch">
+                    <input type="text" class="search-input search-ipt-container" confirm-type="search" v-model="searchText" :placeholder="placeholder" @confirm="doSearch">
                 </form>
                 <span class="search-cancel text-gray" v-if="searchPageShow" @click.stop="searchHide">取消</span>
             </div>
@@ -75,7 +75,10 @@
                     <div>
                         <scroll-view scroll-x class="hotplay-container" :scroll-into-view="viewTo">
                             <div class="image-container relative" style="padding-top: 7px;vertical-align: top;" v-for="(item, index) in selectedClassList" :key="item.id" :id="item.id" @tap="selectCinema(item.id)">
-                                <div class="image-item-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                                <div class="image-item-container bg-eee relative">
+                                    <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image>
+                                    <div class="home-score-container">{{item.tips}}</div>
+                                </div>
                                 <div class="title-text title-p over-omit">{{item.title}}</div>
                                 <div class="subtitle-text p-l-sm over-omit">{{item.subtitle}}</div>
                                 <div class="num-icon num-icon1"v-if="index===0">NO.1</div>
@@ -93,7 +96,10 @@
                     <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
                     <scroll-view scroll-x class="hotplay-container">
                         <div class="image-container vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
-                            <div class="image-item-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                            <div class="image-item-container bg-eee relative">
+                                <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image>
+                                <div class="home-score-container">{{item.tips}}</div>
+                            </div>
                             <div class="title-text title-p over-omit">{{item.title}}</div>
                             <div class="subtitle-text p-l-sm over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
                         </div>
@@ -106,7 +112,10 @@
                         <i-row>
                             <i-col span="8" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
                                 <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
-                                    <div class="recommend-image-container bg-eee"><image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image></div>
+                                    <div class="recommend-image-container bg-eee relative">
+                                        <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image>
+                                        <div class="home-score-container">{{item.tips}}</div>
+                                    </div>
                                     <div>
                                         <div class="title-text m-t-sm over-omit">{{item.title}}</div>
                                         <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
@@ -126,8 +135,9 @@
                         <i-row>
                             <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
                                 <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
-                                    <div class="recommend3-image-container bg-eee">
+                                    <div class="recommend3-image-container bg-eee relative">
                                         <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
+                                        <div class="home-score-container">{{item.tips}}</div>
                                     </div>
                                     <div>
                                         <div class="title-text m-t-xs over-omit">{{item.title}}</div>
@@ -162,19 +172,20 @@
                 <div class="border-bottom p-b-sm" v-if="plate.style_type == 7">
                     <h3 class="day-recommend"><span class="day-recommend-img"></span>{{plate.plate_name}}</h3>
                     <div class="">
-                        <i-row>
-                            <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="nextTopicPage(item)">
-                                <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
-                                    <div class="recommend3-image-container bg-eee">
-                                        <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
-                                    </div>
-                                    <div>
-                                        <div class="title-text m-t-xs over-omit">{{item.title}}</div>
-                                        <div class="subtitle-text over-omit" style="margin-top: 4rpx;height:20rpx;">{{item.subtitle}}</div>
-                                    </div>
-                                </div>
-                            </i-col>
-                        </i-row>
+                        <swiper
+                            class="swiper-container bg-eee"
+                            :indicator-dots="indicatorDots"
+                            :autoplay="autoplay"
+                            :interval="interval"
+                            :duration="duration"
+                            :circular="circular"
+                            indicator-active-color="#ef6c00">
+                            <block v-for="(item, index) in plate.info" :key="item.id">
+                                <swiper-item class="swiper-container" @tap="nextTopicPage(item)">
+                                    <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix" />
+                                </swiper-item>
+                            </block>
+                        </swiper>
                     </div>
                 </div>
             </div>
@@ -927,4 +938,5 @@ export default {
     .vertical-top {
         vertical-align: top;
     }
+    
 </style>
