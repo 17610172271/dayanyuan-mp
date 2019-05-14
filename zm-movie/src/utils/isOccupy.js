@@ -4,8 +4,8 @@
 //根据影院占用时间判断是否占用
 const isOccupy = function (start, end, list) {
     let result = ''
+    if (start * 1000 < new Date().getTime()) return
     for (let i = 0; i < list.length; i++) {
-        console.log(list[i])
         let isOccupy = false
         list[i].times.map(time => {
             if (!(start > time.end_time || end < time.start_time)) {

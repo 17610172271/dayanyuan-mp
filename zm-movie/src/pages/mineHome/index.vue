@@ -168,11 +168,11 @@
                         }
                     })
                 } else if (detail.mp.detail.key == 'mine') {
-                    wx.redirectTo({
+                    wx.reLaunch({
                         url: '../mineHome/main'
                     })
                 } else {
-                    wx.redirectTo({
+                    wx.reLaunch({
                         url: '../index/main'
                     })
                 }

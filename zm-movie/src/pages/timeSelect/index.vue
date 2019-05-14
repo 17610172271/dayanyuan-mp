@@ -15,14 +15,14 @@
             <div class="text-gray text-sm over-omit">{{filmInfo.en_name}}</div>
             <div class="relative" @tap="nextDetailPage">
                 <div class="text-sm text-gray text-line-18 m-t-sm over-omit">导演: {{filmInfo.director}}</div>
-                <div class="text-sm text-gray text-line-18 over-omit">主演: {{filmInfo.actor}}</div>
-                <div class="text-sm text-gray text-line-18 over-omit">类型: {{filmInfo.class}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit" style="padding-right: 60rpx;">主演: {{filmInfo.actor}}</div>
+                <div class="text-sm text-gray text-line-18 over-omit" style="padding-right: 60rpx;">类型: {{filmInfo.class}}</div>
                 <div class="text-sm text-gray text-line-18">上映: {{filmInfo.release_date}}</div>
                 <div class="text-sm text-gray text-line-18">时长: {{filmInfo.length || 0}}分钟</div>
                 <div class="enter-film-detail"><i-icon type="enter" class="icon-center" size="16" color="#ffa726" /></div>
             </div>
             <div class="text-md text-orange text-line-20 text-bold">
-                <span class="text-xs">¥</span>{{filmInfo.min_price}} - <span class="text-xs">¥</span>{{filmInfo.min_price}}
+                <span class="text-xs">¥</span>{{filmInfo.min_price}} - <span class="text-xs">¥</span>{{filmInfo.max_price}}
                 <span class="pull-right text-xs" style="color: #de872d;">{{filmInfo.viewer || 0}}次观看</span>
             </div>
         </div>
@@ -60,7 +60,7 @@
             </div>
         </div>
         <div class="text-center m-t-lg buy-tickets">
-            <button class="select-time-btn text-center" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">立即购票</button>
+            <button class="select-time-btn text-center" :class="{'btn-disabled': status[0]==='不可预定'}" :open-type="openType" @getphonenumber="getPhoneNumber" @tap="nextPage">立即购票</button>
         </div>
         <i-modal-normal i-class="notice-modal" :visible="modal" ok-text="前往支付" cancel-text="取消订单" @ok="goPay" @cancel="cancelOrder">
             <div class="notice-modal-container">
@@ -305,6 +305,29 @@
         },
         onShow () {
             this.modal = false
+            if (this.filmInfo.id) {
+                let that = this
+                wx.getStorage({
+                    key: 'userInfo',
+                    success(res) {
+                        that.userInfo = res.data
+                        wx.getStorage({
+                            key: 'cinemaInfo',
+                            success(res1) {
+                                that.cinemaInfo = res1.data
+                                that.cinemaInfo.distance = that.cinemaInfo.distance > 1000 ? parseInt(that.cinemaInfo.distance / 100) / 10 + 'km' : that.cinemaInfo.distance + 'm'
+                                that.getFilmData(that.filmInfo.id, res1.data.id)
+                            },
+                            fail () {
+                                that.userInfo = {}
+                            }
+                        })
+                    },
+                    fail () {
+                        that.userInfo = {}
+                    }
+                })
+            }
         },
         created () {
             for (let i = 0; i < 24; i++) {
@@ -420,5 +443,8 @@
         bottom: 40rpx;
         left: 50%;
         margin-left: -278rpx;
+    }
+    .btn-disabled {
+        opacity: 0.7;
     }
 </style>

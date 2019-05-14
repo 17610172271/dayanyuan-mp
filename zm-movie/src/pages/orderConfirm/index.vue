@@ -4,11 +4,11 @@
             <h5 class="text-xlg text-bold text-line-normal">{{orderInfo.film_name}}</h5>
             <div class="text-gray text-line-normal" style="margin-top: 14rpx;">{{orderInfo.film_en_name}}</div>
             <div class="text-lg text-line-normal" style="margin-top: 28rpx;">观影时间</div>
-            <div class="text-orange text-line-normal" style="margin-top: 14rpx;">{{watch_time}}</div>
-            <div class="text-lg text-line-normal" style="margin-top: 28rpx;">观影地点</div>
-            <div class="text-bold text-orange text-line-normal" style="margin-top: 14rpx;">{{orderInfo.cinema_address}} {{orderInfo.cinema_name}} {{orderInfo.hall_name}}</div>
+            <div class="text-gray text-line-normal" style="margin-top: 14rpx;">{{watch_time}}</div>
+            <div class="text-lg text-line-normal" style="margin-top: 28rpx;">{{orderInfo.cinema_name}} {{orderInfo.hall_name}}</div>
+            <div class="text-sm text-gray text-line-normal">{{orderInfo.cinema_address}}</div>
             <div class="m-t-md border-top-dashed clear p-t-lg">
-                <div class="pull-left m-l-md">总票价</div>
+                <div class="pull-left m-l-sm" style="line-height: 52rpx;">订单金额</div>
                 <div class="pull-right text-sm text-orange">¥ <span class="text-xxlg">{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div>
             </div>
         </div>

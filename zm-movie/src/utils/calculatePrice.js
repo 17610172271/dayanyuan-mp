@@ -3,7 +3,7 @@ const calculatePrice = function (startTime, priceInfo) {
     console.log('cal')
     let price = 0
     let week = new Date(startTime * 1000).getDay() + ''
-    let hour = new Date(startTime * 1000).getHours()
+    let hour = new Date(startTime * 1000).getHours() + new Date(startTime * 1000).getMinutes() / 60
     let ruleList = []
     if (priceInfo.length ===0) {
         price = ''

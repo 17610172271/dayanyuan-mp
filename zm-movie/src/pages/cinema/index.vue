@@ -62,7 +62,7 @@
                 })
                 this.$http.post(api.common.cinemaNearby, {
                     version: '1.0.0',
-                    center: this.location.length === 2 ? this.location.join(',') : '116.403847,39.915526',
+                    center: this.location.location.length === 2 ? this.location.location.join(',') : '116.403847,39.915526',
                     city: this.city || '北京',
                     limit: this.limit,
                     page: this.page,
@@ -144,11 +144,11 @@
                     data: cinemaInfo
                 })
                 if (this.film_id && this.cinema_id) {
-                    wx.navigateTo({
+                    wx.navigateBack({
                         url: '../timeSelect/main?id=' + this.film_id
                     })
                 } else {
-                    wx.navigateTo({
+                    wx.reLaunch({
                         url: '../index/main?type=refresh'
                     })
                 }

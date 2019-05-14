@@ -53,7 +53,7 @@
                 wx.setStorage({
                     key: 'location',
                     data: {
-                        location: this.location,
+                        location: item.location.split(','),
                         city: item.city,
                         locationCity: this.locationCity,
                         city_id: item.id || item.city_code

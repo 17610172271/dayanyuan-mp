@@ -3,7 +3,7 @@
         <!--搜索-->
         <div class="home-location-container">
             <div class="cinema-info-container" v-if="!searchPageShow" @tap="nextCinemaPage">
-                <div class="text-lg">{{cinemaInfo.name}}<i-icon color="#030303" type="enter" /></div>
+                <div class="text-lg">{{cinemaInfo.name || '附近暂无影院' }}<i-icon color="#030303" type="enter" /></div>
                 <div class="text-xs text-gray p-v-sm" v-show="cinemaInfo.distance">距您{{(cinemaInfo.distance > 1000 ? (cinemaInfo.distance / 100  | Int) / 10 + 'km' : cinemaInfo.distance + 'm') || ''}}</div>
                 <div class="sm text-gray over-omit">{{cinemaInfo.city}}{{cinemaInfo.address}}</div>
             </div>
@@ -23,8 +23,8 @@
                         <span class="hot-search-item bg-eee" v-for="(item, index) in hotKeys" :key="index" @tap="selectItem(item)">{{item}}</span>
                     </div>
                 </div>
-                <div v-show="history.length>0">
-                    <div class="search-top-head text-line-normal text-gray text-md" style="margin-top: 30rpx;">历史搜索</div>
+                <div>
+                    <div class="search-top-head text-line-normal text-gray text-md" style="margin-top: 30rpx;">历史搜索 <span class="pull-right clear-btn" @tap="clearHistory">清除</span></div>
                     <div>
                         <span class="hot-search-item bg-eee" v-for="(item, index) in history" :key="index" @tap="selectItem(item)">{{item}}</span>
                     </div>
@@ -46,7 +46,7 @@
         <div class="home-content-container m-b-lg" v-show="!searchPageShow">
             <div v-for="(plate, plate_id) in homeData" :key="plate.id">
                 <!--轮播-->
-                <div v-if="plate.style_type==1" class="border-bottom p-b-sm">
+                <div v-if="plate.style_type==1" class="border-bottom">
                     <swiper
                         class="swiper-container bg-eee"
                         :indicator-dots="indicatorDots"
@@ -71,7 +71,6 @@
                             </div>
                         </scroll-view>
                     </div>
-
                     <div>
                         <scroll-view scroll-x class="hotplay-container" :scroll-into-view="viewTo">
                             <div class="image-container relative" style="padding-top: 7px;vertical-align: top;" v-for="(item, index) in selectedClassList" :key="item.id" :id="item.id" @tap="selectCinema(item.id)">
@@ -84,7 +83,7 @@
                                 <div class="num-icon num-icon1"v-if="index===0">NO.1</div>
                                 <div class="num-icon num-icon2" v-else-if="index===1">NO.2</div>
                                 <div class="num-icon num-icon3" v-else-if="index===2">NO.3</div>
-                                <div class="num-icon num-icon4" v-else-if="index===3">NO.4</div>
+                                <div class="num-icon num-icon4" v-else>NO.{{index + 1}}</div>
                             </div>
                         </scroll-view>
                     </div>
@@ -111,7 +110,7 @@
                     <div class="">
                         <i-row>
                             <i-col span="8" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="selectCinema(item.id)">
-                                <div :class="{'p-r-xs': index%3==0,'p-l-xs': index%3==2,'p-o-xxs': index%3==1}" class="m-b-md">
+                                <div :class="{'p-o-xxs': index%3==1}" class="m-b-md">
                                     <div class="recommend-image-container bg-eee relative">
                                         <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="scaleToFill"></image>
                                         <div class="home-score-container">{{item.tips}}</div>
@@ -154,7 +153,7 @@
                     <div class="">
                         <i-row>
                             <i-col span="12" i-class="col-class vertical-top" v-for="(item, index) in plate.info" :key="item.id" @tap="nextTopicPage(item)">
-                                <div :class="{'p-r-xs': index%2==0,'p-l-xs': index%2==1}" class="m-b-sm">
+                                <div :class="{'p-r-xxs': index%2==0}" class="m-b-sm">
                                     <div class="recommend3-image-container bg-eee">
                                         <image :lazy-load="true" :src="item.pic_url" class="slide-image" mode="widthFix"></image>
                                     </div>
@@ -221,6 +220,7 @@ import api from '@/api'
 export default {
     data () {
         return {
+            isRequest: false,
             placeholder: '搜索',
             refresh: false,
             city: '北京',
@@ -278,16 +278,18 @@ export default {
                     wx.hideLoading()
                 }, 500)
                 if (res.data.code === 1) {
-
+                    if (this.homeData.length > 0 && res.data.data.page > 1) {
+                        this.homeData = this.homeData.concat(res.data.data.item)
+                    } else if (res.data.data.page === 1) {
+                        this.homeData = res.data.data.item
+                        this.classList = []
+                        this.selectedClassList = []
+                    }
                     if (res.data.data.item.length > 0) {
-                        this.page += 1
+                        this.page = res.data.data.page + 1
+                        this.loadall = false
                     } else {
                         this.loadall = true
-                    }
-                    if (this.homeData.length > 0) {
-                        this.homeData = this.homeData.concat(res.data.data.item)
-                    } else {
-                        this.homeData = res.data.data.item
                     }
                     let rankArr = []
                     this.homeData.map((val, index) => {
@@ -348,7 +350,7 @@ export default {
             wx.getStorage({
                 key: 'cinemaInfo',
                 success(res) {
-                    that.cinemaInfo = res.data || ''
+                    that.cinemaInfo = res.data || {}
                 },
                 fail () {
                     that.$http.post(api.common.cinemaNearby, {
@@ -361,13 +363,13 @@ export default {
                         keywords: ''
                     }).then(res => {
                         if (res.data.code === 1) {
-                            that.cinemaInfo = res.data.data.cinemas[0]
+                            that.cinemaInfo = res.data.data.cinemas[0] || {}
                             wx.setStorage({
                                 key: 'cinemaInfo',
-                                data: res.data.data.cinemas[0]
+                                data: res.data.data.cinemas[0] || {}
                             })
                         } else {
-                            that.cinemaInfo = ''
+                            that.cinemaInfo = {}
                             that.$Toast({
                                 content: res.data.msg,
                                 type: 'error'
@@ -395,6 +397,13 @@ export default {
         selectItem (keywords) {
             this.searchText = keywords
             this.doSearch()
+        },
+        clearHistory () {
+            this.history = []
+            wx.setStorage({
+                key: 'history',
+                data: this.history
+            })
         },
         doSearch () {
             this.search_page = 1
@@ -536,16 +545,17 @@ export default {
                     }
                 })
             } else if (detail.mp.detail.key == 'mine') {
-                wx.redirectTo({
+                wx.reLaunch({
                     url: '../mineHome/main'
                 })
             } else {
-                wx.redirectTo({
+                wx.reLaunch({
                     url: '../index/main'
                 })
             }
         },
         getCity () {
+            this.isRequest = true
             let that = this
             wx.getStorage({
                 key: 'location',
@@ -575,7 +585,7 @@ export default {
                 id: topic.id
             }).then((res) => {
                 if (res.data.code === 1) {
-                    this.homeData[index].info = res.data.data.info
+                    this.homeData[index].info = res.data.data
                 } else {
                     this.$Toast({
                         content: res.data.msg,
@@ -596,6 +606,7 @@ export default {
         },
         getLocation (isLocation) {
             let that = this
+            this.page = 1
             // 获取用户信息及地理位置授权并存储城市位置信息
             wx.getSetting({
                 success(res) {
@@ -630,8 +641,10 @@ export default {
                                             version: '1.0.0'
                                         }).then((res) => {
                                             if (res.data.code === 1) {
+                                                let flag = false
                                                 res.data.data.cities.map(val => {
                                                     if (val.city === city) {
+                                                        flag = true
                                                         id = val.id ||val.city_code
                                                         that.city_id = id
                                                         that.getHomeList()
@@ -649,6 +662,20 @@ export default {
                                                         that.city = that.city.replace('市', '')
                                                     }
                                                 })
+                                                if (!flag) {
+                                                    that.city_id = 110000
+                                                    console.log(123)
+                                                    that.getHomeList()
+                                                    wx.setStorage({
+                                                        key: 'location',
+                                                        data: {
+                                                            location: [116.403847,39.915526],
+                                                            city: '北京市',
+                                                            locationCity: '北京市',
+                                                            city_id: 110000
+                                                        }
+                                                    })
+                                                }
                                             } else {
                                                 that.getHomeList()
                                             }
@@ -679,9 +706,9 @@ export default {
     },
     created () {
         let that = this
-        this.page = 1
-        this.listShow = true
-        this.getCity()
+        // this.page = 1
+        // this.listShow = true
+        // this.getCity()
         this.getHotKeys()
         wx.login({
             success: function(res) {
@@ -711,11 +738,7 @@ export default {
     },
     onShow () {
         let that = this
-        if (this.refresh) {
-            this.homeData = []
-            this.classList = []
-            this.selectedClassList = []
-            this.page = 1
+        if (this.refresh || this.homeData.length === 0) {
             this.getCity()
         }
         this.searchHide()
@@ -737,9 +760,6 @@ export default {
     },
     onLoad (option) {
         this.refresh = option.type ? true : false
-    },
-    onLaunch () {
-        this.getCity()
     },
     watch: {
         searchPageShow (val) {
@@ -806,10 +826,10 @@ export default {
     }
     .scroll-x-container {
         overflow-x: hidden;
+        padding: 34rpx 18rpx 30rpx 18rpx;
     }
     .hotplay-title-container {
         width: 100%;
-        padding: 34rpx 18rpx 30rpx 18rpx;
         line-height: 48rpx;
         white-space: nowrap;
     }
@@ -832,7 +852,7 @@ export default {
     .image-container {
         width: 200rpx;
         display: inline-block;
-        margin-right: 8rpx;
+        margin-right: 5rpx;
     }
     .image-item-container {
         width: 200rpx;
@@ -868,6 +888,9 @@ export default {
     }
     .p-r-xs {
         padding-right: 10rpx;
+    }
+    .p-r-xxs {
+        padding-right: 5rpx;
     }
     .p-o-xxs {
         padding-left: 5rpx;
@@ -938,5 +961,13 @@ export default {
     .vertical-top {
         vertical-align: top;
     }
-    
+    .clear-btn {
+        border:1px solid #ddd;
+        padding:0 10rpx;
+        border-radius:10rpx;
+        background-color:#f6f6f6;
+        font-size: 24rpx;
+        height:40rpx;
+        line-height:40rpx;
+    }
 </style>
