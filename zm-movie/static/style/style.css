@@ -600,4 +600,9 @@ textarea {
     font-size: 24rpx;
     padding-right: 10rpx;
 }
-
+.line-height-24 {
+    line-height: 48rpx;
+}
+.m-t-14 {
+    margin-top: 28rpx;
+}

@@ -10,7 +10,7 @@
                     <div class="text-gray text-center">加载中...</div>
                 </i-spin>
             </div>
-            <div class="order-item-container bg-white" v-for="(item,index) in data" :key="item.trade_id" v-show="!loading||data.length>0">
+            <div class="order-item-container bg-white" v-for="(item,index) in data" :key="item.trade_id" @tap="goOrderDetail(item.trade_id)" v-show="!loading||data.length>0">
                 <div class="order-item-top relative">
                     <div>{{item.hall_name}}</div>
                     <div class="text-gray m-t-sm text-line-20 p-r-lg">{{item.cinema_address}}</div>
@@ -32,14 +32,14 @@
                     <div style="margin-top: 30rpx;" class="clear">
                         <span class="text-orange">{{item.trade_status===0 ? '未支付' : (item.trade_status===1 ? '未使用' : '已使用')}}</span>
                         <div class="pull-right clear" v-if="item.trade_status===0">
-                            <i-button type="ghost" size="small" i-class="btn-order pull-left m-r-8" @tap="cancelPay(item.trade_id)">取消支付</i-button>
-                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="goPay(item.trade_id)">立即支付</i-button>
+                            <i-button type="ghost" size="small" i-class="btn-order pull-left m-r-8" @tap.stop="cancelPay(item.trade_id)">取消支付</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap.stop="goPay(item.trade_id)">立即支付</i-button>
                         </div>
                         <div class="pull-right clear" v-else-if="item.trade_status===1">
-                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="openHall()">扫码入舱</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap.stop="openHall()">扫码入舱</i-button>
                         </div>
                         <div class="pull-right clear" v-else>
-                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap="doComments(item)">评价</i-button>
+                            <i-button type="warning" size="small" i-class="btn-order pull-left" @tap.stop="doComments(item)">评价</i-button>
                         </div>
                     </div>
                 </div>
@@ -155,12 +155,18 @@
                     + '&cinema_name=' + item.cinema_name + '&trade_start_time=' + item.trade_start_time
                 })
             },
+            goOrderDetail (trade_id) {
+                wx.navigateTo({
+                    url: '../myOrderDetail/main?trade_id=' + trade_id
+                })
+            },
             goPay (trade_id) {
                 let that = this
                 this.$http.post(api.common.pay, {
                     version: '1.0.0',
                     trade_id: trade_id,
-                    openid: that.userInfo.open_id
+                    openid: that.userInfo.open_id,
+                    coupon_id: 0
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token

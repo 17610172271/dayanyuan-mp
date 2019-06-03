@@ -585,7 +585,7 @@ export default {
                 id: topic.id
             }).then((res) => {
                 if (res.data.code === 1) {
-                    this.homeData[index].info = res.data.data
+                    this.homeData[index].info = res.data.data.info
                 } else {
                     this.$Toast({
                         content: res.data.msg,

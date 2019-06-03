@@ -1,7 +1,7 @@
 <template>
     <div class="border-top">
         <div class="p-sm">
-            <div class="text-md text-line-normal" style="margin-top: 10rpx;">订单编号: <span class="text-gray text-sm p-l-sm">{{orderInfo.trade_id}}</span></div>
+            <!-- <div class="text-md text-line-normal" style="margin-top: 10rpx;">订单编号: <span class="text-gray text-sm p-l-sm">{{orderInfo.trade_id}}</span></div>
             <div class="text-md text-line-normal m-t-sm">影片名称: <span class="text-gray text-sm p-l-sm">{{orderInfo.film_name}}</span></div>
             <div class="text-md text-line-normal m-t-sm">观影时间: <span class="text-gray text-sm p-l-sm">{{watch_time}}</span></div>
             <div class="text-md text-line-normal m-t-sm">观影影院: <span class="text-gray text-sm p-l-sm">{{orderInfo.cinema_name}} {{orderInfo.hall_name}}</span></div>
@@ -9,7 +9,40 @@
                 {{orderInfo.cinema_address}}<i-icon type="coordinates_fill" size="16" color="#ffa726" /></span>
             </div>
             <div class="text-md text-line-normal m-t-sm">支付方式: <span class="text-gray text-sm p-l-sm">{{orderInfo.pay_type}}</span></div>
-            <div class="text-md text-line-normal m-t-sm">订单金额: <span class="text-orange p-l-sm text-xxlg"><span class="text-sm">¥</span>{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div>
+            <div class="text-md text-line-normal m-t-sm">订单金额: <span class="text-orange p-l-sm text-xxlg"><span class="text-sm">¥</span>{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div> -->
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">订单编号:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.trade_id}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">影片名称:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.film_name}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">观影时间:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{watch_time}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">观影影院:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.cinema_name}}-{{orderInfo.hall_name}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">观影地址:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.cinema_address}}<i-icon type="coordinates_fill" size="17" color="#ffa726" /></i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">支付方式:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.pay_type}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">订单金额:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">￥{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 border-bottom p-v-7">
+                <i-col span="6">优惠券:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.coupon_name||'无'}}</i-col>
+            </i-row>
+            <div class="line-height-24 m-t-14 text-right">实付: <span class="text-orange">￥<span class="text-xxlg">{{orderInfo.pay_money||0}}</span></span></div>
             <div class="text-center" style="margin-top: 200rpx;">
                 <button class="select-time-btn text-center" @tap="backHome">返回首页</button>
             </div>
@@ -90,5 +123,9 @@
         background-image: linear-gradient(275deg, #f57c00, #ffa726);
         color: #fff;
         font-size: 28rpx;
+    }
+    .p-v-7 {
+        padding-top: 7px;
+        padding-bottom: 7px;
     }
 </style>

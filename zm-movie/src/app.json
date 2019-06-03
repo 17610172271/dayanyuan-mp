@@ -1,10 +1,13 @@
 {
   "pages": [
     "pages/index/main",
+    "pages/mineHome/main",
+    "pages/mineCoupon/main",
     "pages/filmDetail/main",
     "pages/filmIntro/main",
     "pages/mineTel/main",
-    "pages/mineHome/main",
+    "pages/mineAbout/main",
+    "pages/rule/main",
     "pages/bacode/main",
     "pages/mineOrder/main",
     "pages/mineDevice/main",
@@ -16,6 +19,8 @@
     "pages/search/main",
     "pages/cinemaSelect/main",
     "pages/orderDetail/main",
+    "pages/myOrderDetail/main",
+    "pages/couponList/main",
     "pages/orderConfirm/main",
     "pages/timeSelect/main",
     "pages/mineComments/main",

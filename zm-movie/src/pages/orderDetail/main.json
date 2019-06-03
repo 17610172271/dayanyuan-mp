@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "订单详情",
   "usingComponents": {
-    "i-icon": "../../../static/iView/icon/index"
+    "i-icon": "../../../static/iView/icon/index",
+    "i-row": "../../../static/iView/row/index",
+    "i-col": "../../../static/iView/col/index"
   }
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="border-top">
         <div class="order-info bg-white">
-            <h5 class="text-xlg text-bold text-line-normal">{{orderInfo.film_name}}</h5>
+            <!-- <h5 class="text-xlg text-bold text-line-normal">{{orderInfo.film_name}}</h5>
             <div class="text-gray text-line-normal" style="margin-top: 14rpx;">{{orderInfo.film_en_name}}</div>
             <div class="text-lg text-line-normal" style="margin-top: 28rpx;">观影时间</div>
             <div class="text-gray text-line-normal" style="margin-top: 14rpx;">{{watch_time}}</div>
@@ -10,7 +10,35 @@
             <div class="m-t-md border-top-dashed clear p-t-lg">
                 <div class="pull-left m-l-sm" style="line-height: 52rpx;">订单金额</div>
                 <div class="pull-right text-sm text-orange">¥ <span class="text-xxlg">{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</span></div>
-            </div>
+            </div> -->
+            <i-row i-class="line-height-24">
+                <i-col span="6">影片名称:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.film_name}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">观影时间:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{watch_time}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">观影影院:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.cinema_name}}-{{orderInfo.hall_name}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">观影地址:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">{{orderInfo.cinema_address}}<i-icon type="coordinates_fill" size="17" color="#ffa726" /></i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">订单金额:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit">￥{{((orderInfo.trade_money - orderInfo.discount_money)*100|Int)/100}}</i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">优惠券:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit"><navigator :url="'/pages/couponList/main?trade_id='+orderInfo.trade_id+'&coupon_id='+coupon_id">{{coupon_name?coupon_name:'请选择'}}<i-icon type="enter" size="14" style="vertical-align: 4rpx;margin-left: 10rpx;" /></navigator></i-col>
+            </i-row>
+            <i-row i-class="line-height-24 m-t-14">
+                <i-col span="6">需付:</i-col>
+                <i-col span="18" i-class="text-gray text-right text-sm over-omit text-orange">￥<span class="text-xxlg">{{(orderInfo.trade_money - orderInfo.discount_money - coupon_money) > 0 ? ((orderInfo.trade_money - orderInfo.discount_money - coupon_money)*100|Int)/100 : 0}}</span></i-col>
+            </i-row>
         </div>
         <div class="p-md">
             <h5 class="text-dark text-bold text-line-normal">购票须知:</h5>
@@ -41,11 +69,15 @@
                 userInfo: {},
                 watch_time: '',
                 effective_time: 9999999999999,
-                modal: false
+                modal: false,
+                coupon_id: 0,
+                coupon_name: '',
+                coupon_money: 0
             }
         },
         methods: {
             getOrderData (id) {
+                let that = this
                 if (!id) return
                 wx.showLoading({
                     title: '加载中',
@@ -66,7 +98,7 @@
                         this.watch_time = format(this.orderInfo.trade_start_time, this.orderInfo.trade_end_time)
                         this.effective_time = parseInt(new Date().getTime()) + this.orderInfo.effective_time * 1000
                     } else {
-                        this.$Toast({
+                        that.$Toast({
                             content: res.data.msg,
                             type: 'error'
                         })
@@ -78,7 +110,8 @@
                 this.$http.post(api.common.pay, {
                     version: '1.0.0',
                     trade_id: this.orderInfo.trade_id,
-                    openid: this.userInfo.open_id
+                    openid: this.userInfo.open_id,
+                    coupon_id: this.coupon_id || 0
                 }, {
                     headers: {
                         'AuthToken': this.userInfo.auth_token
@@ -116,12 +149,22 @@
                             type: 'error'
                         })
                     }
+                }).catch(res => {
+                console.log(res)
+                    this.$Toast({
+                        content: res.response.data.msg,
+                        type: 'error'
+                    })
                 })
             },
             format: format
         },
         onLoad (option) {
             let that = this
+            this.coupon_id = option.coupon_id
+            console.log(this.coupon_id)
+            this.coupon_name = option.coupon_name
+            this.coupon_money = option.coupon_money || 0
             wx.getStorage({
                 key: 'userInfo',
                 success(res) {
@@ -133,7 +176,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     page {
         background-color: #f5f5f5 !important;
     }
@@ -153,4 +196,5 @@
         color: #fff;
         font-size: 28rpx;
     }
+    
 </style>

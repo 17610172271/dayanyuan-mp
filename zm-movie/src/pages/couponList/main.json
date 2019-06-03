@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "可用优惠券",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

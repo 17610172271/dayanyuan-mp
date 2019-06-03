@@ -48,9 +48,16 @@ export  const order = {
     cancel: '/api/v1/order/close', // 取消订单
     comment: '/api/v1/profile/post_movie_evaluate', // 提交评价
 }
+export const coupon = {
+    list: '/api/v1/coupon/list', // 优惠券列表
+    getNum: '/api/v1/coupon/getNum', // 获取优惠券数量
+    getRule: '/api/v1/coupon/couponRule', // 获取优惠券规则
+    getCoupon: '/api/v1/coupon/matching', // 获取与订单匹配的优惠券
+}
 export default {
     common,
     film,
     mine,
-    order
+    order,
+    coupon
 }

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "使用规则",
+  "usingComponents": {
+    "i-icon": "../../../static/iView/icon/index"
+  }
+}

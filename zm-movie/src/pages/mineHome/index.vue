@@ -8,14 +8,25 @@
                 <button v-else open-type="getPhoneNumber" @getphonenumber="getPhoneNumber" class="info-tel" style="color: #ef7008;">绑定手机号 <span class="info-tel-img"><img src="/static/img/invalid-name@3x.png" alt=""></span></button>
             </div>
         </div>
-        <div>
+        <div class="text-center p-v-sm">
+            <navigator class="home-btn-item m-r-lg" url="/pages/mineCollect/main"><span class="mine-item-img mine-item-collect"></span>收藏</navigator>
+            <navigator class="home-btn-item" url="/pages/mineCoupon/main"><span class="mine-item-img mine-item-coupon"></span>优惠券</navigator>
+        </div>
+        <div class="line-f5"></div>
+        <ul class="mine-list-container">
+            <li @tap="navigateTo('mineOrder')"><span class="mine-list-img mine-list-order"></span>我的订单<i-icon type="enter" class="pull-right mine-list-icon" size="16" color="#cacaca" /></li>
+            <li @tap="navigateTo('mineHelp')"><span class="mine-list-img mine-list-help"></span>帮助中心<i-icon type="enter" class="pull-right mine-list-icon" size="16" color="#cacaca" /></li>
+            <li @tap="navigateTo('mineAbout')"><span class="mine-list-img mine-list-about"></span>关于我们<i-icon type="enter" class="pull-right mine-list-icon" size="16" color="#cacaca" /></li>
+            <li @tap="navigateTo('mineDevice')"><span class="mine-list-img mine-list-device"></span>设备控制<i-icon type="enter" class="pull-right mine-list-icon" size="16" color="#cacaca" /></li>
+        </ul>
+<!--         <div>
             <i-cell-group>
                 <i-cell title="我的收藏" is-link url="/pages/mineCollect/main"></i-cell>
                 <i-cell title="我的订单" is-link url="/pages/mineOrder/main"></i-cell>
                 <i-cell title="我的设备" is-link url="/pages/mineDevice/main"></i-cell>
                 <i-cell title="帮助中心" i-class="border-bottom" is-link url="/pages/mineHelp/main"></i-cell>
             </i-cell-group>
-        </div>
+        </div> -->
         <i-modal i-class="notice-modal" :visible="modal" ok-text="去预定" cancel-text="再看看" @ok="doOk" @cancel="doCancel">
             <div class="notice-modal-container" style="height: 156px;background-image: url(https://img01.wanfangche.com/public/upload/201901/29/5c4fc50127400.png);background-repeat: no-repeat;background-size: 100% 156px;padding:40px;">
                 <div class="text-xlg">您没有可用的观影券 <br> 请先预定</div>
@@ -40,7 +51,7 @@
     </div>
 </template>
 
-<script type="text/ecmascript-6">
+<script>
     import api from '@/api'
     export default {
         data () {
@@ -117,6 +128,11 @@
                 this.modal = false
                 this.modal1 = false
                 this.modal2 = false
+            },
+            navigateTo (target) {
+                wx.navigateTo({
+                    url: '../' + target +'/main'
+                })
             },
             tabChange (detail) {
                 let that = this
@@ -241,6 +257,71 @@
         height: 100%;
         vertical-align: middle;
     }
-
-
+    .home-btn-item {
+        display: inline-block;
+        width: 292rpx;
+        height: 92rpx;
+        line-height: 92rpx;
+        color: #fff;
+        font-weight: 500;
+        font-size: 30rpx;
+        border-radius: 4px;
+        box-shadow: 0 4px 4px 0 rgba(255, 206, 206, 0.98);
+        background-image: linear-gradient(to right, #ffa862, #fa667d);
+    }
+    .line-f5 {
+        height: 16rpx;
+        background-color: #f5f5f5;
+    }
+    .mine-item-img {
+        display: inline-block;
+        width: 72rpx;
+        height: 72rpx;
+        margin-right: 14rpx;
+        vertical-align: -20rpx;
+    }
+    .mine-item-collect {
+        background: url(../../../static/img/ic@3x.png) no-repeat;
+        background-size: cover;
+    }
+    .mine-item-coupon {
+        background: url(../../../static/img/ic-discount@3x.png) no-repeat;
+        background-size: cover;
+    }
+    .mine-list-container li {
+        height: 96rpx;
+        line-height: 96rpx;
+        font-family: PingFangSC;
+        font-size: 14px;
+        color: rgba(42, 42, 42, 0.87);
+        padding-left: 74rpx;
+        border-bottom: 2rpx solid #e4e4e4;
+    }
+    .mine-list-icon {
+        margin-right: 56rpx;
+        font-weight: bold;
+    }
+    .mine-list-img {
+        display: inline-block;
+        width: 56rpx;
+        height: 56rpx;
+        margin-right: 36rpx;
+        vertical-align: -16rpx;
+    }
+    .mine-list-order {
+        background: url(../../../static/img/ic-mony@3x.png) no-repeat;
+        background-size: cover;
+    }
+    .mine-list-help {
+        background: url(../../../static/img/ic-help@3x.png) no-repeat;
+        background-size: cover;
+    }
+    .mine-list-about {
+        background: url(../../../static/img/ic-aboutus@3x.png) no-repeat;
+        background-size: cover;
+    }
+    .mine-list-device {
+        background: url(../../../static/img/ic-equipment@3x.png) no-repeat;
+        background-size: cover;
+    }
 </style>
